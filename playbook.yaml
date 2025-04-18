@@ -1,0 +1,5 @@
+- name: WSO-Config
+  hosts: localhost
+  tasks:
+    - name: Ping
+      ansible.builtin.ping:
