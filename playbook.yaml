@@ -1,5 +1,6 @@
+# our very firt testing config
 - name: WSO-Config
-  hosts: localhost
+  hosts: myhosts
   tasks:
     - name: Ping
       ansible.builtin.ping:
