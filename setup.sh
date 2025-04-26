@@ -5,10 +5,15 @@ CONFIG_FILE="$(pwd)/setup-data"
 DEFAULT_HYPERVISOR=""
 ISO_NAME="AlmaLinux-9-latest.iso"
 ARCH=$(uname -m)
+
+# weird macOS specific behavior
+if [ "$ARCH" == "arm64" ]; then
+  ARCH="aarch64"
+fi
+
 ISO_PATH="$PWD/$ISO_NAME"
 VM_NAME="AlmaLinux-WSO"
 
-# check for existing hypervisor preference
 if [[ -f "$CONFIG_FILE" ]]; then
     source "$CONFIG_FILE"
 else
@@ -26,7 +31,6 @@ else
     echo "DEFAULT_HYPERVISOR=$DEFAULT_HYPERVISOR" > "$CONFIG_FILE"
 fi
 
-# check for package manager (ansible install)
 install_ansible() {
     echo "[setup.sh] Ansible is not installed. Attempting an install..."
     if command -v apt-get &>/dev/null; then
@@ -45,13 +49,11 @@ install_ansible() {
     fi
 }
 
-# check if ansible is installed, else try to install
 if ! command -v ansible &>/dev/null; then
     echo "[setup.sh] Ansible not found. Attempting installation..."
     install_ansible
 fi
 
-# check for required VM manager
 if [[ "$DEFAULT_HYPERVISOR" == "VirtualBox" ]]; then
     if ! command -v VBoxManage &>/dev/null; then
         echo "[setup.sh] VirtualBox not found. Please install VirtualBox."
@@ -74,7 +76,6 @@ elif [[ "$DEFAULT_HYPERVISOR" == "qemu" ]]; then
     fi
 fi
 
-# ISO URL selection
 if [[ "$ARCH" == "x86_64" ]]; then
     ISO_URL="https://repo.almalinux.org/almalinux/9/isos/x86_64/AlmaLinux-9-latest-x86_64-dvd.iso"
 elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
@@ -83,7 +84,6 @@ else
     echo "[setup.sh] Unsupported arch: $ARCH"; exit 1
 fi
 
-# Download ISO if missing
 if [[ ! -f "$ISO_PATH" ]]; then
     read -rp "[setup.sh] ISO not found. Download AlmaLinux 9 for $ARCH? (y/N) " yn
     case "$yn" in
@@ -92,7 +92,6 @@ if [[ ! -f "$ISO_PATH" ]]; then
     esac
 fi
 
-# Check if VM is running or needs to be created
 if [[ "$DEFAULT_HYPERVISOR" == "QEMU" ]]; then
     [[ -f alma9_disk.qcow2 ]] || qemu-img create -f qcow2 "$VM_NAME.qcow2" 10G
     qemu-system-x86_64 \
@@ -105,7 +104,6 @@ if [[ "$DEFAULT_HYPERVISOR" == "QEMU" ]]; then
     exit 0
 fi
 
-# VirtualBox or UTM block (depending on user choice)
 if [[ "$DEFAULT_HYPERVISOR" == "VirtualBox" ]]; then
     VBoxManage list vms | grep "\"$VM_NAME\"" || {
         VBoxManage createvm --name "$VM_NAME" --register
@@ -121,7 +119,15 @@ if [[ "$DEFAULT_HYPERVISOR" == "VirtualBox" ]]; then
     sleep 30
     IP=$(VBoxManage guestproperty get "$VM_NAME" "/VirtualBox/GuestInfo/Net/0/V4/IP" | awk '{print $2}')
 elif [[ "$DEFAULT_HYPERVISOR" == "UTM" ]]; then
-    # TODO: implement applescript commands here
+    echo "[setup.sh] Calling AppleScript, here goes nothing..."
+    # fix for -euo pipefail
+    osascript utm-handler.scpt "$ARCH" "$VM_NAME" "$ISO_PATH" &>/dev/null || true
+    if [ $? -eq 0 ]; then
+	echo "[setup.sh] VM already exists!"
+    else
+	echo "[setup.sh] VM exists now. Start it at your leisure."
+	echo "UTM_INSTALLED=1" >> "$CONFIG_FILE"
+    fi
     echo "[setup.sh] Currently, there's no easy IP detection for UTM, sorry."
     echo "[setup.sh] Check the settings for your VM and find what this is, or run the \"ip a\" command."
     IP="unknown"
