@@ -18,10 +18,10 @@ $vmName = "AlmaLinux-WSO"
 if (Test-Path $configFile) {
     . $configFile
 } else {
-    Write-Host "[setup.ps1] choose your hypervisor:"
+    Write-Host "[setup.ps1] Choose your hypervisor:"
     Write-Host "1) QEMU"
     Write-Host "2) VirtualBox"
-    $hvSel = Read-Host "[setup.ps1] selection [1-2]"
+    $hvSel = Read-Host "[setup.ps1] Selection [1-2]: "
     switch ($hvSel) {
         "1" { $defaultHypervisor = "QEMU" }
         "2" { $defaultHypervisor = "VirtualBox" }
@@ -37,7 +37,7 @@ function Install-Ansible {
     } elseif (Get-Command choco -ErrorAction SilentlyContinue) {
         choco install ansible
     } else {
-        Write-Error "[setup.ps1] no package manager found. install winget or choco manually."
+        Write-Error "[setup.ps1] No package manager found. Install winget or choco manually."
         exit 1
     }
 }
