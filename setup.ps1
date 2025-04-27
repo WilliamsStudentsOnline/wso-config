@@ -3,8 +3,16 @@ $ErrorActionPreference = "Stop"
 
 $configFile = "$PWD\.setup-data"
 $defaultHypervisor = ""
-$isoName = "AlmaLinux-9-latest.iso"
+$isoName = "AlmaLinux-9.5-$arch.iso"
 $arch = (Get-CimInstance Win32_Processor).Architecture
+
+# we should not run on anything but Windows,
+# the other script is for Unix hosts.
+if ($IsWindows -or $ENV:OS) {
+    Write-Host "[setup.ps1] This is the Windows setup script. Do not run this on WSL!"
+} else {
+    Write-Error "[setup.ps1] Don't run this script in portable versions of PowerShell!"
+}
 
 switch ($arch) {
     9 { $archString = "arm64" }
@@ -31,13 +39,15 @@ if (Test-Path $configFile) {
 }
 
 function Install-Ansible {
-    Write-Host "[setup.ps1] trying to install Ansible..."
+    Write-Host "[setup.ps1] Trying to install Ansible..."
     if (Get-Command winget -ErrorAction SilentlyContinue) {
+	Write-Host "[setup.ps1] Please approve the installation on the next prompt."
         winget install --id RedHat.Ansible -e
     } elseif (Get-Command choco -ErrorAction SilentlyContinue) {
+	Write-Host "[setup.ps1] Please approve the installation on the next prompt."
         choco install ansible
     } else {
-        Write-Error "[setup.ps1] No package manager found. Install winget or choco manually."
+        Write-Error "[setup.ps1] No package manager found. Install winget or choco, or install Ansible manually."
         exit 1
     }
 }
@@ -65,7 +75,7 @@ switch ($archString) {
 }
 
 if (-not (Test-Path $isoPath)) {
-    $yn = Read-Host "[setup.ps1] ISO not found. Download AlmaLinux 9 for $archString? (y/N)"
+    $yn = Read-Host "[setup.ps1] ISO not found. Download AlmaLinux 9.5 for $archString? (y/N)"
     if ($yn -match '^[Yy]$') {
         Invoke-WebRequest -Uri $isoUrl -OutFile $isoPath
     } else {
@@ -75,6 +85,7 @@ if (-not (Test-Path $isoPath)) {
 }
 
 if ($defaultHypervisor -eq "QEMU") {
+    Write-Host "[setup.ps1] Making VM if it doesn't exist, then booting..."
     if (-not (Test-Path "alma9_disk.qcow2")) {
         qemu-img create -f qcow2 "$vmName.qcow2" 10G
     }
@@ -89,6 +100,7 @@ if ($defaultHypervisor -eq "QEMU") {
 }
 
 if ($defaultHypervisor -eq "VirtualBox") {
+    Write-Host "[setup.ps1] Making VM if it doesn't exist, then booting..."
     $vms = VBoxManage list vms
     if ($vms -notmatch $vmName) {
         VBoxManage createvm --name $vmName --register
@@ -104,9 +116,10 @@ if ($defaultHypervisor -eq "VirtualBox") {
     # TODO: probably buggy as hell
     $ipResult = VBoxManage guestproperty get $vmName "/VirtualBox/GuestInfo/Net/0/V4/IP"
     $ip = ($ipResult -split ' ')[-1]
+    Write-Host "[setup.ps1] We have made a best guess attempt at determining your IP address for the VM. You may wish to change this manually, since it is a known bug that VirtualBox may return the wrong one, especially if you have many VMs or have one active while this script was running."
 }
 
 "[alma9]" | Out-File -Append inventory.ini
 "$ip ansible_user=root ansible_ssh_common_args='-o StrictHostKeyChecking=no'" | Out-File -Append inventory.ini
-Write-Host "[setup.ps1] inventory written to inventory.ini."
-Write-Host "[setup.ps1] delete .setup-data to reset."
+Write-Host "[setup.ps1] Inventory written to inventory.ini. SSH into that IP address."
+Write-Host "[setup.ps1] Delete .setup-data to reset."

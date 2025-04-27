@@ -5,7 +5,7 @@ set -euo pipefail
 
 CONFIG_FILE="$(pwd)/.setup-data"
 DEFAULT_HYPERVISOR=""
-ISO_NAME="AlmaLinux-9-latest.iso"
+ISO_NAME="AlmaLinux-9.5-$ARCH.iso"
 ARCH=$(uname -m)
 
 # weird macOS specific behavior
@@ -48,6 +48,7 @@ install_ansible() {
     elif command -v zypper &>/dev/null; then
         sudo zypper install ansible
     else
+	echo "[setup.sh] Couldn't find a package manager even though I tried (maybe you use something weird or your shell is broken?)."
         echo "[setup.sh] No viable Ansible installation method. Quitting..."
         exit 1
     fi
@@ -81,15 +82,15 @@ elif [[ "$DEFAULT_HYPERVISOR" == "qemu" ]]; then
 fi
 
 if [[ "$ARCH" == "x86_64" ]]; then
-    ISO_URL="https://repo.almalinux.org/almalinux/9/isos/x86_64/AlmaLinux-9-latest-x86_64-dvd.iso"
+    ISO_URL="https://repo.almalinux.org/almalinux/9.5/isos/x86_64/AlmaLinux-9.5-x86_64-boot.iso"
 elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
-    ISO_URL="https://repo.almalinux.org/almalinux/9/isos/aarch64/AlmaLinux-9-latest-aarch64-dvd.iso"
+    ISO_URL="https://repo.almalinux.org/almalinux/9.5/isos/x86_64/AlmaLinux-9.5-aarch64-boot.iso"
 else
     echo "[setup.sh] Unsupported arch: $ARCH"; exit 1
 fi
 
 if [[ ! -f "$ISO_PATH" ]]; then
-    read -rp "[setup.sh] ISO not found. Download AlmaLinux 9 for $ARCH? (y/N) " yn
+    read -rp "[setup.sh] ISO not found. Download AlmaLinux 9.5 for $ARCH? (y/N) " yn
     case "$yn" in
         [Yy]*) curl -L -o "$ISO_PATH" "$ISO_URL" ;;
         *) echo "[setup.sh] Need ISO but not allowed to download nor does the file exist. Aborting."; exit 1 ;;
@@ -97,6 +98,7 @@ if [[ ! -f "$ISO_PATH" ]]; then
 fi
 
 if [[ "$DEFAULT_HYPERVISOR" == "QEMU" ]]; then
+    echo "[setup.sh] Creating VM if it doesn't exist, then booting..."
     [[ -f alma9_disk.qcow2 ]] || qemu-img create -f qcow2 "$VM_NAME.qcow2" 10G
     qemu-system-x86_64 \
       -m 2048 -smp 2 \
@@ -105,10 +107,14 @@ if [[ "$DEFAULT_HYPERVISOR" == "QEMU" ]]; then
       -boot d \
       -netdev user,id=net0 \
       -device virtio-net-pci,netdev=net0 \
+
+    echo "[setup.sh] You have closed the VM. Please open it manually from now on."
+    # TODO: better handling. split this script into multiple ones
     exit 0
 fi
 
 if [[ "$DEFAULT_HYPERVISOR" == "VirtualBox" ]]; then
+    echo "[setup.sh] Creating VM if it doesn't exist, then booting..."
     VBoxManage list vms | grep "\"$VM_NAME\"" || {
         VBoxManage createvm --name "$VM_NAME" --register
         VBoxManage modifyvm "$VM_NAME" --memory 2048 --acpi on --boot1 dvd --ostype RedHat_64 --ioapic on --cpus 2
@@ -122,6 +128,7 @@ if [[ "$DEFAULT_HYPERVISOR" == "VirtualBox" ]]; then
     echo "[setup.sh] Waiting 30s for boot..."
     sleep 30
     IP=$(VBoxManage guestproperty get "$VM_NAME" "/VirtualBox/GuestInfo/Net/0/V4/IP" | awk '{print $2}')
+    Write-Host "[setup.sh] We have made a best guess attempt at determining your IP address for the VM. You may wish to change this manually, since it is a known bug that VirtualBox may return the wrong one, especially if you have many VMs or have one active while this script was running."
 elif [[ "$DEFAULT_HYPERVISOR" == "UTM" ]]; then
     echo "[setup.sh] Calling AppleScript, here goes nothing..."
     # fix for -euo pipefail
@@ -134,6 +141,7 @@ elif [[ "$DEFAULT_HYPERVISOR" == "UTM" ]]; then
     fi
     echo "[setup.sh] Currently, there's no easy IP detection for UTM, sorry."
     echo "[setup.sh] Check the settings for your VM and find what this is, or run the \"ip a\" command."
+    echo "[setup.sh] Also, by default, UTM outputs to the serial console. If you don't know what this is, edit your VM settings to get graphical output by adding a display device, or change the serial console to output to a terminal emulator of your choice."
     IP="unknown"
 else
     echo "[setup.sh] No VM manager found."
