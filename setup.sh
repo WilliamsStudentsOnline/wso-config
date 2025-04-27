@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
+##### WSO-Config WSO 2.0 #####
+
 set -euo pipefail
 
-CONFIG_FILE="$(pwd)/setup-data"
+CONFIG_FILE="$(pwd)/.setup-data"
 DEFAULT_HYPERVISOR=""
 ISO_NAME="AlmaLinux-9-latest.iso"
 ARCH=$(uname -m)
@@ -13,6 +15,8 @@ fi
 
 ISO_PATH="$PWD/$ISO_NAME"
 VM_NAME="AlmaLinux-WSO"
+
+echo "[setup.sh] This is the macOS/Linux setup script. Do not run this on WSL!"
 
 if [[ -f "$CONFIG_FILE" ]]; then
     source "$CONFIG_FILE"
@@ -141,4 +145,4 @@ echo "[alma9]" >> inventory.ini
 # TODO: this is terrible.
 echo "$IP ansible_user=root ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> inventory.ini 
 echo "[setup.sh] Inventory written to inventory.ini. Edit that file if you use UTM; SSH into that IP address."
-echo "[setup.sh] To reset this setup, delete setup-data."
+echo "[setup.sh] To reset this setup, delete .setup-data in this directory."
