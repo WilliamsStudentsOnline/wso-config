@@ -8,7 +8,7 @@ $ ./setup.sh
 ```
 Or, if you're on Windows:
 ``` shell
-# ./setup.ps1 
+$ ./setup.ps1 
 ```
 You will need to install [Ansible](https://www.ansible.com), which you can do with
 `$ brew install ansible` on macOS, or `pip install ansible` anywhere. On Linux it's in your package manager. On Windows, get it by installing WSL.
