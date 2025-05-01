@@ -1,0 +1,28 @@
+##### WSO-Config WSO 2.0 #####
+
+# force this on
+- name: Enable SELinux enforcing
+  selinux:
+    policy: targeted
+    state: enforcing
+
+# too many of these. go check the values in ../../vars/main.yml
+- name: Harden sysctl
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  loop: "{{ sysctl_hardening }}"
+
+  # enable this for security reasons
+- name: Install auditd
+  dnf:
+    name: audit
+    state: present
+
+- name: Enable auditd
+  systemd:
+    name: auditd
+    enabled: yes
+    state: started

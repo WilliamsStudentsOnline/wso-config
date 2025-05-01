@@ -1,3 +1,5 @@
+##### WSO-Config WSO 2.0 #####
+
 # this makes all our downloads faster, so do this first.
 - name: Tweak dnf.conf
   ini_file:

@@ -3,4 +3,5 @@
   become: yes
   roles:
     - ensure_packages
-    - htop
+    - core_packages
+    - hardening

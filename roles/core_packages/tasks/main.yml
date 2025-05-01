@@ -1,0 +1,31 @@
+##### WSO-Config WSO 2.0 #####
+
+# installs all the things not included, but that one expects to have
+- name: Install core packages
+  ansible.builtin.dnf:
+    name: "{{ core_packages }}"
+    state: present
+  vars:
+    core_packages:
+      - vim
+      - emacs-nox
+      - nano
+      - curl
+      - wget
+      - git
+      - htop
+      - atop
+      - ftp
+      - tree
+      - rsync
+      - setools
+      - fuse
+      - fuse-sshfs
+
+# define these in the host_vars section
+- name: Install machine-specific packages
+  ansible.builtin.dnf:
+    name: "{{ machine_packages }}"
+    state: present
+  when: machine_packages is defined
+      
