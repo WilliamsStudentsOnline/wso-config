@@ -8,7 +8,7 @@ $ ./setup.sh
 ```
 Or, if you're on Windows:
 ``` shell
-$ ./setup.ps1 
+# ./setup.ps1 
 ```
 You will need to install [Ansible](https://www.ansible.com), which you can do with
 `$ brew install ansible` on macOS, or `pip install ansible` anywhere. On Linux it's in your package manager. On Windows, get it by installing WSL.
@@ -27,7 +27,7 @@ Alternatively, do:
 ``` shell
 $ make run-dev # get better debugging
 ```
-
+At this point, you will be prompted to enter the root password. Be sure that you have enabled password login in your VM's ssh config, and that the root account has a password. Change the Makefile to log in as another user (they must be able to run `sudo` though). Then, Ansible will execute all of the tasks as you requested. You can safely re-run this over and over again as you test.
 ## Directory Structure
 The directory is organized as follows:
 ``` shell
