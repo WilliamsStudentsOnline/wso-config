@@ -1,0 +1,24 @@
+# this makes all our downloads faster, so do this first.
+- name: Tweak dnf.conf
+  ini_file:
+    path: /etc/dnf/dnf.conf
+    section: main
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+  loop:
+    - { option: fastestmirror, value: true }
+    - { option: max_parallel_downloads, value: 10 }
+    - { option: defaultyes, value: true }
+
+# need to do this first to get latest package lists
+- name: Update DNF cache
+  ansible.builtin.dnf:
+    update_cache: yes
+
+# enable Extra Packages for Enterprise Linux
+- name: Enable EPEL repo
+  ansible.builtin.dnf:
+    name: epel-release
+    state: present
+
+

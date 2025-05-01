@@ -1,0 +1,4 @@
+- name: install htop
+  dnf:
+    name: htop
+    state: present

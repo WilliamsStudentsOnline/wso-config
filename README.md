@@ -31,13 +31,16 @@ $ make run-dev # get better debugging
 ## Directory Structure
 The directory is organized as follows:
 ``` shell
-inventories/ # system-specific stuff
-	hosts.ini # the actual server locations
-	prod/ # production server
-	dev/ # development server
-	backup/ # backup server
+roles/ # where we keep specific tasks (mostly by-package)
+inventory/
+	hosts.ini 
+group_vars/
+	all.yml # variables for all hosts
+host_vars/ # variables per-host
+	prod.yml
+	dev.yml
+	backup.yml
 library/ # any modules we use
 site.yml # the main, site-agnostic config
-roles/ # any WSO-specific actions we use
 ```
-Looking for something moved from `wso-go`? It's probably in `inventories/prod`.
+Looking for something moved from `wso-go`? It's probably in `roles/`, under the appropriate package.
