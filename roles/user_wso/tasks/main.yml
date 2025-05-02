@@ -1,0 +1,14 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Create WSO user
+  ansible.builtin.user:
+    name: wso
+    comment: WSO Sysadmin Role
+    uid: 1793 # year Williams was founded
+    create_home: yes
+    shell: /bin/zsh
+    generate_ssh_key: yes
+    ssh_key_type: "ed25519"
+    ssh_key_comment: "Ansible-generated WSO Sysadmin key on $HOSTNAME"
+    
+    

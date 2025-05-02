@@ -1,0 +1,11 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Create OIT user
+  ansible.builtin.user:
+    name: oit
+    comment: OIT Server Access
+    uid: 1971 # year co-education began at Williams
+    create_home: yes
+    generate_ssh_key: yes
+    ssh_key_type: "ed25519"
+    ssh_key_comment: "Ansible-generated OIT access key on $HOSTNAME"

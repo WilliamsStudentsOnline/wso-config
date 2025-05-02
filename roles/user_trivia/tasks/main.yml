@@ -1,0 +1,12 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Create trivia user
+  ansible.builtin.user:
+    name: trivia
+    comment: Trivia FTP Access
+    uid: 1755 # year Ephraim Williams died in battle
+    create_home: yes
+    shell: /bin/bash
+    generate_ssh_key: yes
+    ssh_key_type: "ed25519"
+    ssh_key_comment: "Ansible-generated Trivia FTP access key on $HOSTNAME"

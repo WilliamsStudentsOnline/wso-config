@@ -1,0 +1,24 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install fail2ban
+  dnf:
+    name: fail2ban
+    state: present
+
+- name: Enable and start fail2ban
+  systemd:
+    name: fail2ban
+    enabled: yes
+    state: started
+
+- name: Configure SSH jail
+  copy:
+    dest: /etc/fail2ban/jail.d/sshd.conf
+    content: |
+      [sshd]
+      enabled = true
+      port = ssh
+      filter = sshd
+      logpath = /var/log/secure
+      maxretry = 5
+      bantime = 600

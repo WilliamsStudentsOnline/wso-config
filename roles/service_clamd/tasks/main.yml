@@ -1,0 +1,21 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install clamd
+  ansible.builtin.dnf:
+    name: "{{ clamd_packages }}"
+    state: present
+  vars:
+    clamd_packages:
+      - clamav
+      - clamav-update
+      - clamd
+
+# TODO: we want to make this better
+# https://docs.clamav.net/manual/Usage/Configuration.html
+      
+#- name: Enable and start clamd
+#  systemd:
+#    name: clamd@scan
+#    enabled: yes
+#    state: started
+

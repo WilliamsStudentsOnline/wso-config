@@ -2,6 +2,14 @@
 - hosts: all
   become: yes
   roles:
+    # essential configuration
     - ensure_packages
     - core_packages
     - hardening
+    # services
+    - service_fail2ban
+    - service_clamd
+    # users
+    - user_wso
+    - user_trivia
+    - user_oit
