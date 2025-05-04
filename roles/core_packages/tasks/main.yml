@@ -28,4 +28,10 @@
     name: "{{ machine_packages }}"
     state: present
   when: machine_packages is defined
+
+# absolutely needed for packages we'll install later not found in repos
+- name: Create out-of-repo package directory
+  ansible.builtin.file:
+    path: /root/ansible
+    state: directory
       

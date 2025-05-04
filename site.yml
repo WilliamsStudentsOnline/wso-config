@@ -11,6 +11,8 @@
     - service_fail2ban
     - service_clamd
     - service_zram
+    - service_grafana
+    - service_prometheus
     # users
     - user_wso
     - user_trivia

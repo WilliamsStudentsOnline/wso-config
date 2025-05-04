@@ -1,0 +1,38 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Create Prometheus directory
+  ansible.builtin.file:
+    path: /root/ansible/prometheus
+    state: directory
+
+# TODO: prometheus has a very complicated packaging situation.
+# we will need to manage versions ourselves, it seems.
+
+# - name: Download Prometheus GPG signing key
+#   ansible.builtin.get_url:
+#     url: https://raw.githubusercontent.com/lest/prometheus-rpm/master/RPM-GPG-KEY-prometheus-rpm
+#     dest: /root/ansible/prometheus/gpg.key
+
+# - name: Import Prometheus GPG signing key
+#   ansible.builtin.shell: sudo rpm --import /root/ansible/prometheus/gpg.key
+
+# - name: Copy Prometheus repository
+#   ansible.builtin.copy:
+#     src: prometheus.repo
+#     dest: /etc/yum.repos.d/prometheus.repo
+
+# - name: Update DNF cache after adding repo
+#   ansible.builtin.dnf:
+#     update_cache: yes
+
+# - name: Install Prometheus
+#   ansible.builtin.dnf:
+#     name: prometheus2
+#     state: present
+
+# - name: Install Prometheus Node Exporter
+#   ansible.builtin.dnf:
+#     name: node_exporter
+#     state: present
+
+# # TODO: configure Prometheus

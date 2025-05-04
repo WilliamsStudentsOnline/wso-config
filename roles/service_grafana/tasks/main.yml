@@ -1,0 +1,32 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Create Grafana directory
+  ansible.builtin.file:
+    path: /root/ansible/grafana
+    state: directory
+
+- name: Download Grafana GPG signing key
+  ansible.builtin.get_url:
+    url: https://rpm.grafana.com/gpg.key
+    dest: /root/ansible/grafana/gpg.key
+
+- name: Import Grafana GPG signing key
+  ansible.builtin.shell: sudo rpm --import /root/ansible/grafana/gpg.key
+
+- name: Copy Grafana repository
+  ansible.builtin.copy:
+    src: grafana.repo
+    dest: /etc/yum.repos.d/grafana.repo
+
+- name: Update DNF cache after adding repo
+  ansible.builtin.dnf:
+    update_cache: yes
+
+- name: Install Grafana
+  ansible.builtin.dnf:
+    name: grafana
+    state: present
+
+# TODO: configure grafana
+    
+  
