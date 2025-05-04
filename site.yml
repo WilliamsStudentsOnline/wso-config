@@ -6,9 +6,11 @@
     - ensure_packages
     - core_packages
     - hardening
+    - branding
     # services
     - service_fail2ban
     - service_clamd
+    - service_zram
     # users
     - user_wso
     - user_trivia

@@ -1,0 +1,28 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Setup MOTD files
+  ansible.builtin.copy:
+    src: motd-production
+    dest: /etc/motd
+    backup: yes
+
+# TODO: per host
+# - name: Configure hostnames
+#   ansible.builtin.hostname:
+#     name: "{{ host_name }}"
+#     use: systemd
+#.  ansible.builtin.command:
+#.    command: hostnamectl set-hostname "wso-backend"
+#   when: host_name is defined
+
+
+
+# - name: Setup MOTD files
+#   ansible.builtin.copy:
+#     src: "{{ system_motd }}"
+#     dest: /etc/motd
+#     backup: yes
+#   when: system_motd is defined
+  
+    
+    

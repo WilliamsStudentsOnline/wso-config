@@ -1,0 +1,18 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install zram-generator
+  dnf:
+    name: zram-generator
+    state: present
+
+- name: Configure zram block devices
+  ansible.builtin.copy:
+    src: zram_generator.conf
+    dest: /etc/systemd/zram-generator.conf
+    backup: yes
+
+- name: Enable and start zram-generator
+  systemd:
+    name: systemd-zram-setup@zram0
+    enabled: yes
+    state: started

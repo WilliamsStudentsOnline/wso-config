@@ -1,0 +1,13 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install oomd
+  dnf:
+    name: oomd
+    state: present
+
+- name: Enable and start oomd
+  systemd:
+    name: oomd
+    enabled: yes
+    state: started
+
