@@ -13,7 +13,7 @@
     state: directory
     mode: '0755'
 
-- name: Mount production server on
+- name: Mount production server on remote
   hosts: wso-backup
   ansible.posix.mount:
     path: /remote
