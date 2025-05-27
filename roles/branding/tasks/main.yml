@@ -1,28 +1,25 @@
 ##### WSO-Config WSO 2.0 #####
 
+# TODO: per host
+- name: Manually set /etc/hostname
+  copy:
+    dest: /etc/hostname
+    content: "{{ host_name }}\n"
+    owner: root
+    group: root
+    mode: '0644'
+  when: host_name is defined
+
+- name: Set hostname immediately
+  command: hostnamectl set-hostname "{{ host_name }}"
+  when: host_name is defined  
+
 - name: Setup MOTD files
   ansible.builtin.copy:
-    src: motd-production
+    src: "{{ system_motd }}"
     dest: /etc/motd
     backup: yes
-
-# TODO: per host
-# - name: Configure hostnames
-#   ansible.builtin.hostname:
-#     name: "{{ host_name }}"
-#     use: systemd
-#.  ansible.builtin.command:
-#.    command: hostnamectl set-hostname "wso-backend"
-#   when: host_name is defined
-
-
-
-# - name: Setup MOTD files
-#   ansible.builtin.copy:
-#     src: "{{ system_motd }}"
-#     dest: /etc/motd
-#     backup: yes
-#   when: system_motd is defined
+  when: system_motd is defined
   
     
     

@@ -1,0 +1,35 @@
+##### WSO-Config WSO 2.0 #####
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+    policy: deny
+    # note that "log" here logs fails, not other stuff
+    log: true
+
+- name: Turn on UFW logging
+  community.general.ufw:
+    logging: "high"
+
+- name: Enable SSH in UFW
+  community.general.ufw:
+    rule: allow
+    name: OpenSSH
+
+- name: Unblock common ports in UFW
+  community.general.ufw:
+    rule: allow
+    port: '80'
+    proto: tcp
+  community.general.ufw:
+    rule: allow
+    port: '443'
+    proto: tcp
+  community.general.ufw:
+    rule: allow
+    # NTP
+    port: '123'
+    proto: tcp
+
+
+    
+    

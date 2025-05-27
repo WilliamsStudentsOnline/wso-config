@@ -17,10 +17,8 @@
       - atop
       - ftp
       - tree
-      - rsync
       - setools
       - fuse
-      - fuse-sshfs
 
 # define these in the host_vars section
 - name: Install machine-specific packages
