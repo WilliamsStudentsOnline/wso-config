@@ -1,18 +1,24 @@
 ##### WSO-Config WSO 2.0 #####
 - hosts: all
+  # turn off in production, some errors are natural and fine
+  # but it's useful to keep this on for debugging reasons
+  ignore_errors: no
   become: yes
   roles:
     # essential configuration
+    - branding
     - ensure_packages
     - core_packages
     - hardening
-    - branding
+
     # services
+    - service_ufw
     - service_fail2ban
     - service_clamd
     - service_zram
     - service_grafana
     - service_prometheus
+    
     # users
     - user_wso
     - user_trivia
