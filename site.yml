@@ -12,12 +12,16 @@
     - hardening
 
     # services
+    - service_backup
     - service_ufw
     - service_fail2ban
     - service_clamd
     - service_zram
     - service_grafana
     - service_prometheus
+
+    # wso software
+    - wso_cronjobs
     
     # users
     - user_wso
