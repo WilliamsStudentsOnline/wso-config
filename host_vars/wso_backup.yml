@@ -1,0 +1,6 @@
+host_name: "wso-backup"
+system_motd: "motd-backup"
+machine_packages:
+  - fuse-sshfs
+  - rsync
+
