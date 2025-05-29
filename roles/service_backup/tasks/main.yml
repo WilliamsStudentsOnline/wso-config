@@ -1,33 +1,33 @@
 ##### WSO-Config WSO 2.0 #####
 - name: Create backup directory (backup server)
-  hosts: wso-backup
   ansible.builtin.file:
     path: /backup
     state: directory
     mode: '0755'
+  when: inventory_hostname == 'wso_backup'
 
 - name: Create remote directory (remote server)
-  hosts: wso-backup
   ansible.builtin.file:
     path: /remote
     state: directory
     mode: '0755'
+  when: inventory_hostname == 'wso_backup'
 
 - name: Mount production server on remote
-  hosts: wso-backup
   ansible.posix.mount:
     path: /remote
     src: wso-prod:/
     fstype: fuse.sshfs
     opts: allow_other,IdentityFile=/root/.ssh/id_rsa
     state: mounted
+  when: inventory_hostname == 'wso_backup'
 
 - name: Create backup directory (prod server)
-  hosts: wso-prod
   ansible.builtin.file:
     path: /backup
     state: directory
     mode: '0755'
+  when: inventory_hostname == 'wso_prod'
 
 # TODO: configure rest of backup job
 
