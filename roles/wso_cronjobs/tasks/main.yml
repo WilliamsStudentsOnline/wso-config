@@ -1,7 +1,7 @@
 ##### WSO-Config WSO 2.0 #####
-- name: Create WSO cronjobs on production
+- name: Create WSO cronjob Factrak survey deficits
+  when: inventory_hostname == 'wso_prod'
   # TODO: enable jobs once the wso-backend build is set up correctly
-  hosts: wso-prod
   # Factrak survey deficits
   ansible.builtin.cron:
     env: true
@@ -12,6 +12,8 @@
     hour: "0"
     minute: "0"
     job: "/bin/bash -l -c '/home/wso/wso/wso-backend/jobs/update-all-factrak-survey-deficits -console -config /home/wso/wso/wso-backend/config.yaml >> /home/wso/wso/wso-backend/logs/update-all-factrak-survey-deficits-cron.log 2>&1'"
+- name: Create WSO cronjob User updates
+  when: inventory_hostname == 'wso_prod'
   # User update
   ansible.builtin.cron:
     env: true
@@ -20,6 +22,8 @@
     hour: "1"
     minute: "0"
     job: "/bin/bash -l -c '/home/wso/wso/wso-backend/jobs/update-all-users-from-ldap -console -config /home/wso/wso/wso-backend/config.yaml >> /home/wso/wso/wso-backend/logs/update-all-users-from-ldap-cron.log 2>&1'"
+- name: Create WSO cronjob Catalog updates
+  when: inventory_hostname == 'wso_prod'
   # Catalog update
   ansible.builtin.cron:
     env: true
@@ -28,6 +32,8 @@
     hour: "3"
     minute: "0"
     job: " /bin/bash -l -c '/home/wso/wso/wso-backend/jobs/catalog-update -config /home/wso/wso/wso-backend/config.yaml -file /home/wso/wso/static/courses.json -factrak-file /home/wso/wso/static-auth/courses.json >> /home/wso/wso/wso-backend/logs/catalog-update-cron.log 2>&1'"
+- name: Create WSO cronjob CSV data updates
+  when: inventory_hostname == 'wso_prod'
   # User CSV Data Update
   ansible.builtin.cron:
     env: true
@@ -36,6 +42,8 @@
     hour: "4"
     minute: "0"
     job: "/bin/bash -l -c '/home/wso/wso/wso-backend/jobs/user-csv-data -console -config /home/wso/wso/wso-backend/config.yaml -file /var/sftp/oit/wso_student_data.csv >> /home/wso/wso/wso-backend/logs/user-csv-data-cron.log 2>&1'"
+- name: Create WSO cronjob Dining updates
+  when: inventory_hostname == 'wso_prod'
   # Dining update
   ansible.builtin.cron:
     env: true
@@ -44,6 +52,8 @@
     hour: "1"
     minute: "0"
     job: "/bin/bash -l -c '/home/wso/wso/wso-backend/jobs/dining-update -out /home/wso/wso/static/dining.json -vi /home/wso/wso/wso-backend/vendor_info.yaml -eats4Ephs >> /home/wso/wso/wso-backend/logs/dining-update-cron.log 2>&1'"
+- name: Create WSO cronjob Salmon notifications
+  when: inventory_hostname == 'wso_prod'
   # Salmon scheduled notification
   ansible.builtin.cron:
     env: true
@@ -52,6 +62,8 @@
     hour: "9"
     minute: "0"
     job: "/bin/bash -l -c '/home/wso/wso/wso-backend/jobs/schedule-notifs -notif salmon -console -config /home/wso/wso/wso-backend/config.yaml >> /home/wso/wso/wso-backend/logs/schedule-notifs-cron.log 2>&1'"
+- name: Create WSO cronjob On campus semester increment
+  when: inventory_hostname == 'wso_prod'
   # Increment on-campus semester
   ansible.builtin.cron:
     env: true
@@ -62,6 +74,8 @@
     hour: "0"
     minute: "0"
     job: "/bin/bash -l -c '/home/wso/wso/wso-backend/jobs/update-on-campus-semesters -console -config /home/wso/wso/wso-backend/config.yaml >> /home/wso/wso/wso-backend/logs/update-on-campus-semesters-cron.log 2>&1'"
+- name: Create WSO cronjob Professor updates
+  when: inventory_hostname == 'wso_prod'
   # Update professor's area of study
   ansible.builtin.cron:
     env: true
@@ -72,6 +86,8 @@
     hour: "0"
     minute: "0"
     job: "/bin/bash -l -c '/home/wso/wso/wso-backend/jobs/update_profs_areas_of_study -console -config /home/wso/wso/wso-backend/config.yaml >> /home/wso/wso/wso-backend/logs/update-profs_areas_of_study-cron.log 2>&1'"
+- name: Create WSO cronjob EphMatch reset
+  when: inventory_hostname == 'wso_prod'
   # Reset EphMatch every Sept. 1st
   ansible.builtin.cron:
     env: true
@@ -82,6 +98,8 @@
     hour: "0"
     minute: "0"
     job: "/bin/bash -l -c '/home/wso/wso/wso-backend/jobs/ephmatch-reset -console -config /home/wso/wso/wso-backend/config.yaml >> /home/wso/wso/wso-backend/logs/ephmatch-reset-cron.log 2>&1'"
+- name: Create WSO cronjob EphMatch setup
+  when: inventory_hostname == 'wso_prod'
   # Create EphMatch dates on Jan. 1st
   ansible.builtin.cron:
     env: true
@@ -92,7 +110,6 @@
     hour: "0"
     minute: "0"
     job: "/bin/bash -l -c '/home/wso/wso/wso-backend/jobs/ephmatch_update_dates -file /home/wso/wso/wso-backend/config.yaml >> /home/wso/wso/wso-backend/logs/ephmatch-update-dates-cron.log 2>&1'"
-
   
   
     
