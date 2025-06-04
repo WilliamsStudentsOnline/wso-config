@@ -5,6 +5,7 @@
   ignore_errors: no
   become: yes
   roles:
+    - service_ufw
     # essential configuration
     - branding
     - ensure_packages
@@ -12,13 +13,14 @@
     - hardening
 
     # services
-    #- service_backup
-    - service_ufw
+    - service_backup
     - service_fail2ban
     #- service_clamd
+    - service_webmin
     - service_zram
     - service_grafana
     - service_prometheus
+    - service_oomd
 
     # wso software
     - wso_cronjobs
