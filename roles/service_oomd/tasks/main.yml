@@ -1,13 +1,16 @@
 ##### WSO-Config WSO 2.0 #####
+# TODO: this seems to fail because of a kernel error.
+# I'm leaving it in, in the event that it's ever fixed,
+# because it's a very useful feature to have.
 
 - name: Install oomd
   dnf:
-    name: oomd
+    name: systemd-oomd
     state: present
 
 - name: Enable and start oomd
   systemd:
-    name: oomd
+    name: systemd-oomd
     enabled: yes
     state: started
 

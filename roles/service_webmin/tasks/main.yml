@@ -1,0 +1,25 @@
+##### WSO-Config WSO 2.0 #####
+- name: Install Webmin the canonical way
+  shell: |
+   curl -o /root/ansible/webmin-setup-repo.sh https://raw.githubusercontent.com/webmin/webmin/master/webmin-setup-repo.sh
+   sh /root/ansible/webmin-setup-repo.sh -f
+  # without forcing, webmin won't install. don't remove that -f!
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
+
+- name: Install Webmin using new repos
+  dnf:
+    name: webmin
+    state: present
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
+
+- name: Enable and start webmin
+  systemd:
+    name: webmin
+    enabled: yes
+    state: started
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
+
+
+
+
+

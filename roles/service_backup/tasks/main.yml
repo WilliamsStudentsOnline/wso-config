@@ -13,14 +13,19 @@
     mode: '0755'
   when: inventory_hostname == 'wso_backup'
 
-- name: Mount production server on remote
-  ansible.posix.mount:
-    path: /remote
-    src: wso-prod:/
-    fstype: fuse.sshfs
-    opts: allow_other,IdentityFile=/root/.ssh/id_rsa
-    state: mounted
-  when: inventory_hostname == 'wso_backup'
+# TODO: what's needed here is like... a whole annoying custom user.
+# this is way too much work to fix. consider rsync job instead
+# basically, make an admin user with mount perms on prod,
+# then let them mount the directory here. solves the issue
+
+# - name: Mount production server on remote
+#   ansible.posix.mount:
+#     path: /remote
+#     src: wso-prod:/
+#     fstype: fuse.sshfs
+#     opts: allow_other,IdentityFile=/root/.ssh/id_rsa
+#     state: mounted
+#   when: inventory_hostname == 'wso_backup'
 
 - name: Create backup directory (prod server)
   ansible.builtin.file:
