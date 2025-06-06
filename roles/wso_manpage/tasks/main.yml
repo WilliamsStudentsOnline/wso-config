@@ -1,0 +1,21 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Setup man page for wso-backend
+  ansible.builtin.copy:
+    src: wso-backend.1
+    # use /usr/local because then no config change needed
+    dest: /usr/local/share/man/man1/
+    mode: 0644
+    group: '0' # standard for man pages
+    owner: '0' # standard for man pages
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
+
+- name: Compress man page for wso-backend
+  # assuming it's bash? who knows
+  shell: |
+   if [ -f /usr/local/share/man/man1/wso-backend.1.gz ]; then
+    rm /usr/local/share/man/man1/wso-backend.1.gz
+   fi
+   gzip /usr/local/share/man/man1/wso-backend.1
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
+

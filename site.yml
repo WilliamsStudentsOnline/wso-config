@@ -20,10 +20,12 @@
     - service_zram
     - service_grafana
     - service_prometheus
+    - service_mailman3
     - service_oomd
 
     # wso software
     - wso_cronjobs
+    - wso_manpage
     
     # users
     - user_wso
