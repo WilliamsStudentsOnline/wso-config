@@ -19,6 +19,8 @@ Go get a copy of [AlmaLinux 9](https://almalinux.org)'s ISO image, then do a bar
 
 Once you have your installation done and remove the ISO from your virtual disk drive, make a copy of your installed VM. You can do this any way you want, but make sure to actually do this, because when a bad Ansible command trashes your VM you'll really wish you had it. Besides: you should test ideally on a vanilla installation anyways, restoring to vanilla and running Ansible to ensure it really works. You will need a fast internet connection for the Ansible tests to work (they re-install the DNF package cache a few times, which can be slow). 
 
+Jobs should never fail, but some jobs always result in a change or a skip. If a job fails, file a bug report.
+
 ## Building
 When running for the first time, run the following command: 
 ``` shell
