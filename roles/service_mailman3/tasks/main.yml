@@ -1,0 +1,25 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install mailman3
+  dnf:
+    name: mailman3
+    state: present
+
+- name: Install hyperkitty
+  dnf:
+    name: hyperkitty
+    state: present
+
+# TODO: we need postmap. and to configure them first
+
+# - name: Enable and start mailman3
+#   systemd:
+#     name: mailman3
+#     enabled: yes
+#     state: started
+
+# - name: Enable and start hyperkitty
+#   systemd:
+#     name: hyperkitty
+#     enabled: yes
+#     state: started
