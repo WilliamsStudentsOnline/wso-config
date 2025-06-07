@@ -13,7 +13,7 @@ $ ./setup.ps1
 You will need to install [Ansible](https://www.ansible.com), which you can do with
 `$ brew install ansible` on macOS, or `pip install ansible` anywhere. On Linux it's in your package manager. On Windows, get it by installing WSL, then running the Linux installation shell script.
 
-You will also need something to manage VMs. You can get [UTM](https://mac.getutm.app) on macOS or [VirtualBox](https://www.virtualbox.org) on Windows and Linux. Alternatively, use QEMU if you know what you're doing.
+You will also need something to manage VMs. You can get [UTM](https://mac.getutm.app) on macOS or [VirtualBox](https://www.virtualbox.org) on Windows and Linux. Alternatively, use [QEMU](https://qemu.org) if you know what you're doing.
 
 Go get a copy of [AlmaLinux 9](https://almalinux.org)'s ISO image, then do a barebones vanilla install into the VM. Install as few packages as possible! It's very difficult for Ansible to safely batch remove unneeded packages, and it will only add what is strictly needed. So rather than installing something, simply add it to this configuration. Make sure that you make **multiple** VMs by cloning that first installation, one for each role (Prod, Dev, Backup). This way, you can accurately simulate a real deployment. 
 
@@ -35,7 +35,7 @@ Alternatively, do:
 ``` shell
 $ make run-dev # get better debugging
 ```
-At this point, you will be prompted to enter the root password. Be sure that you have enabled password login in your VM's SSH config, and that the root account has a password. Change the Makefile to log in as another user (they must be able to run `sudo` though). Then, Ansible will execute all of the tasks as you requested. You can safely re-run this over and over again as you test.
+At this point, you will be prompted to enter the root password. Be sure that you have enabled password login in your VM's SSH config, and that the root account has a password. Change the Makefile to log in as another user (they must be able to run `sudo` though). Then, Ansible will execute all of the tasks as you requested. You can safely re-run this over and over again as you test. Make sure that all machines use *the same root password*, otherwise this may not work. 
 
 ## Directory Structure
 The directory is organized as follows:
@@ -53,3 +53,10 @@ library/ # any modules we use
 site.yml # the main, site-agnostic config
 ```
 Looking for something moved from `wso-go`? It's probably in `roles/`, under the appropriate package.
+
+## Roles Structure
+Roles are named to indicate what purpose they serve. You should name your roles correctly, so that changes can be picked up by Ansible and so that future developers understand where every setting is configured.
+- Roles lacking a prefix: these are special roles that add key features. They will be moved later into one with a prefix (likely `settings`). 
+- `service` roles: These roles add new daemons to the servers and configure them. Please do not use a service for adding packages which are intended to be manually invoked.
+- `wso` roles: These roles implement WSO's services and ensure stable deployment of WSO code. Do not use these to add anything else.
+- `user` roles: These roles add login data for real human users; non-human users should be made in the `service` role they are used for. 
