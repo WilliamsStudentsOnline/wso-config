@@ -15,19 +15,6 @@
     direction: in
     interface: lo
 
-- name: Allow established connections
-  community.general.ufw:
-    rule: allow
-    direction: in
-    from_ip: any
-    to_ip: any
-    state: RELATED,ESTABLISHED
-
-- name: Allow ICMP Ping
-  ufw:
-    rule: allow
-    proto: icmp
-
 - name: Allow SSH (rate limited)
   community.general.ufw:
     rule: limit
