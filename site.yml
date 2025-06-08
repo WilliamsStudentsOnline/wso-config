@@ -23,6 +23,7 @@
     - service_grafana
     - service_prometheus
     - service_mailman3
+    - service_mysql
     - service_oomd
 
     # wso software
