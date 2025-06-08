@@ -13,6 +13,7 @@
     - fresh_kernel
 
     # services
+    - service_auditd
     - service_backup
     - service_ufw
     - service_fail2ban

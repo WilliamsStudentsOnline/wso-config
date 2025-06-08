@@ -1,0 +1,12 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install auditd
+  dnf:
+    name: audit
+    state: present
+
+- name: Enable and start auditd
+  systemd:
+    name: auditd
+    enabled: yes
+    state: started
