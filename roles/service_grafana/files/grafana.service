@@ -1,0 +1,62 @@
+##### WSO-Backend WSO 2.0 #####
+[Unit]
+Description=Grafana Server
+Documentation=http://docs.grafana.org
+Wants=network-online.target
+After=network-online.target
+After=prometheus.service prometheus-node-exporter.service
+
+[Service]
+Environment="GF_DATABASE_PATH=/var/lib/grafana/grafana.db"
+# uncomment if you need this
+#EnvironmentFile=/etc/default/grafana
+User=root
+Group=root
+Type=notify
+Restart=on-failure
+WorkingDirectory=/usr/share/grafana
+RuntimeDirectory=grafana
+RuntimeDirectoryMode=0750
+ExecReload=/bin/kill -HUP $MAINPID
+# change all of this to reference the correct paths!
+# you should be able to find all these files within prod_files.
+ExecStart=grafana-server \
+ --config=/etc/grafana/grafana-config.ini \
+ --homepath="/usr/share/grafana" \
+ --packaging=rpm \
+ 
+# it can be a bit slow sometimes
+TimeoutStopSec=120s
+SendSIGKILL=no
+
+# hardening stuff
+# AmbientCapabilities=
+# CapabilityBoundingSet=
+# LimitNOFILE=10000
+# LimitMEMLOCK=0
+# CapabilityBoundingSet=
+# DeviceAllow=/dev/null rw
+# LockPersonality=true
+# MemoryDenyWriteExecute=false
+# NoNewPrivileges=true
+# PrivateDevices=true
+# PrivateTmp=true
+# ProtectClock=true
+# ProtectControlGroups=true
+# ProtectHome=true
+# ProtectHostname=true
+# ProtectKernelLogs=true
+# ProtectKernelModules=true
+# ProtectKernelTunables=true
+# ProtectProc=invisible
+# ProtectSystem=full
+# RemoveIPC=true
+# RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+# RestrictNamespaces=true
+# RestrictRealtime=true
+# RestrictSUIDSGID=true
+# SystemCallArchitectures=native
+# UMask=0027
+
+[Install]
+WantedBy=multi-user.target

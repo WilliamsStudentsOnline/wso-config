@@ -5,6 +5,7 @@
     path: /root/ansible/grafana
     state: directory
 
+# TODO: move all these into /tmp
 - name: Download Grafana GPG signing key
   ansible.builtin.get_url:
     url: https://rpm.grafana.com/gpg.key
@@ -16,6 +17,7 @@
 - name: Copy Grafana repository
   ansible.builtin.copy:
     src: grafana.repo
+    force: yes
     dest: /etc/yum.repos.d/grafana.repo
 
 - name: Update DNF cache after adding repo
@@ -26,6 +28,54 @@
   ansible.builtin.dnf:
     name: grafana
     state: present
+
+- name: Copy Grafana service file
+  ansible.builtin.copy:
+    src: grafana.service
+    force: yes
+    dest: /usr/lib/systemd/system/
+
+- name: Refresh systemd service file cache
+  ansible.builtin.shell: systemctl daemon-reload
+
+- name: Copy Grafana configuration file
+  ansible.builtin.copy:
+    src: grafana-config.ini
+    force: yes
+    dest: /etc/grafana/
+
+# TODO: apparently you can do this in Ansible nowadays,
+# so we should stop doing it this old-fashioned way.
+- name: Copy Grafana DB file
+  ansible.builtin.copy:
+    src: grafana.db
+    force: yes
+    dest: /var/lib/grafana/
+
+# TODO: def better way of doing this. too lazy though
+- name: Create needed Grafana files
+  ansible.builtin.shell: |
+   if [ ! -f  "/root/ansible/grafana/grafana-config.ini" ]; then
+     touch /root/ansible/grafana/grafana-config.ini
+   fi
+   if [ ! -f  "/root/ansible/grafana/grafana-server.pid" ]; then
+     touch /root/ansible/grafana/grafana-config.pid
+   fi
+   if [ ! -f  "/root/ansible/grafana/logs" ]; then
+     mkdir -p /root/ansible/grafana/logs
+   fi
+   if [ ! -f  "/root/ansible/grafana/data" ]; then
+     mkdir -p /root/ansible/grafana/data
+   fi
+   if [ ! -f  "/root/ansible/grafana/plugins" ]; then
+     mkdir -p /root/ansible/grafana/plugins
+   fi
+
+- name: Enable and start Grafana
+  systemd:
+    name: grafana
+    enabled: yes
+    state: started
 
 # TODO: configure grafana
     
