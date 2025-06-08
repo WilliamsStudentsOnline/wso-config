@@ -5,32 +5,102 @@
     name: ufw
     state: present
 
+- name: Turn on ufw logging
+  community.general.ufw:
+    logging: "high"
+
+- name: Allow loopback
+  community.general.ufw:
+    rule: allow
+    direction: in
+    interface: lo
+
+- name: Allow established connections
+  community.general.ufw:
+    rule: allow
+    direction: in
+    from_ip: any
+    to_ip: any
+    state: RELATED,ESTABLISHED
+
+- name: Allow ICMP Ping
+  ufw:
+    rule: allow
+    proto: icmp
+
+- name: Allow SSH (rate limited)
+  community.general.ufw:
+    rule: limit
+    port: 22
+    proto: tcp
+
+- name: Allow HTTP
+  ufw:
+    rule: allow
+    port: 80
+    proto: tcp
+
+- name: Allow HTTPS
+  ufw:
+    rule: allow
+    port: 443
+    proto: tcp
+
+- name: Allow NTP
+  ufw:
+    rule: allow
+    port: 123
+    proto: udp
+
+- name: Allow Grafana
+  ufw:
+    rule: allow
+    port: 3000
+    proto: tcp
+
+- name: Allow Prometheus
+  ufw:
+    rule: allow
+    port: 9090
+    proto: tcp
+
+- name: Allow mailman web interface
+  ufw:
+    rule: allow
+    port: 8000
+    proto: tcp
+
+- name: Allow mailman SMTP (inbound mail)
+  ufw:
+    rule: allow
+    port: 25
+    proto: tcp
+
+- name: Allow mailman submission (auth SMTP)
+  ufw:
+    rule: allow
+    port: 587
+    proto: tcp
+
+- name: Allow mailman IMAP/POP (if we're hosting mailboxes)
+  ufw:
+    rule: allow
+    port: 993
+    proto: tcp
+
 - name: Enable and start ufw
   systemd:
     name: ufw
     enabled: yes
     state: started
 
-- name: Enable UFW
+- name: Enable ufw
   community.general.ufw:
     state: enabled
     policy: deny
     # note that "log" here logs fails, not other stuff
     log: true
 
-- name: Turn on UFW logging
-  community.general.ufw:
-    logging: "high"
-
-- name: Unblock common ports in UFW
-  community.general.ufw:
-    rule: allow
-    port: "{{ item }}"
-    proto: tcp
-  loop:
-    - '80'
-    - '443'
-    - '123'
-
-    
+- name: Reload ufw policy, if we changed anything
+  ansible.builtin.shell: ufw reload
     
