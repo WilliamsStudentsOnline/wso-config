@@ -1,0 +1,11 @@
+##### WSO-Config WSO 2.0 #####
+# This file is for networking stuff that has to be done first.
+# We always reference things by name if possible; this is where we define
+
+- name: Ensure /etc/hosts has peer hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars[item].ansible_host | default(item) }} {{ hostvars[item].host_name }}"
+    create: yes
+    state: present
+  loop: "{{ groups['all'] | difference([inventory_hostname]) }}"

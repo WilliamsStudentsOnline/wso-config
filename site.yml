@@ -10,16 +10,18 @@
     - ensure_packages
     - core_packages
     - hardening
+    - networking
     - fresh_kernel
 
     # services
     - service_auditd
-    - service_backup
+    - service_zram
     - service_ufw
     - service_fail2ban
+    - service_backup
+    - service_apache
     #- service_clamd
     - service_webmin
-    - service_zram
     - service_grafana
     - service_prometheus
     - service_mailman3
