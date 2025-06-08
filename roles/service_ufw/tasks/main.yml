@@ -5,9 +5,11 @@
     name: ufw
     state: present
 
-- name: Turn on ufw logging
-  community.general.ufw:
-    logging: "high"
+- name: Set logging to high
+  ansible.builtin.lineinfile:
+    path: /etc/ufw/ufw.conf
+    regexp: '^LOGLEVEL='
+    line: 'LOGLEVEL=high'
 
 - name: Allow loopback
   community.general.ufw:
@@ -84,13 +86,13 @@
     port: 993
     proto: tcp
 
-- name: Enable and start ufw
+- name: Enable and start ufw job
   systemd:
     name: ufw
     enabled: yes
     state: started
 
-- name: Enable ufw
+- name: Enable ufw kernel-level firewall
   community.general.ufw:
     state: enabled
     policy: deny

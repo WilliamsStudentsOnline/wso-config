@@ -12,7 +12,7 @@ Environment="GF_DATABASE_PATH=/var/lib/grafana/grafana.db"
 #EnvironmentFile=/etc/default/grafana
 User=root
 Group=root
-Type=notify
+Type=simple
 Restart=on-failure
 WorkingDirectory=/usr/share/grafana
 RuntimeDirectory=grafana
