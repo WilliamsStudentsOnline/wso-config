@@ -1,0 +1,29 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install dnf-automatic
+  dnf:
+    name: dnf-automatic
+    state: present
+
+- name: Create override dir for dnf-automatic.timer
+  file:
+    path: /etc/systemd/system/dnf-automatic.timer.d
+    state: directory
+    mode: '0755'
+
+- name: Override dnf-automatic timer to run every Saturday
+  copy:
+    dest: /etc/systemd/system/dnf-automatic.timer.d/override.conf
+    content: |
+      [Timer]
+      OnCalendar=
+      OnCalendar=Sat *-*-* 06:00:00
+
+- name: Reload systemd timers
+  shell: systemctl daemon-reexec
+
+- name: Ensure dnf-automatic timer is enabled and started
+  systemd:
+    name: dnf-automatic.timer
+    enabled: true
+    state: started
