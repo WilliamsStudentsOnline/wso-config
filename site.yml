@@ -20,6 +20,7 @@
     - service_ufw
     - service_fail2ban
 
+    - service_dnfauto
     - service_apache
     #- service_clamd
     - service_webmin

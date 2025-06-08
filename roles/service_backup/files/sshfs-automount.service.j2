@@ -1,0 +1,13 @@
+[Unit]
+Description=SSHFS mount for {{ remote_path }} at {{ local_path }}
+After=network.target
+
+[Mount]
+What=root@{{ remote_host }}:{{ remote_path }}
+Where={{ local_path }}
+Type=fuse.sshfs
+Options=IdentityFile=/root/.ssh/borg_key,allow_other,_netdev,default_permissions,reconnect,x-systemd.automount
+TimeoutSec=30
+
+[Install]
+WantedBy=multi-user.target

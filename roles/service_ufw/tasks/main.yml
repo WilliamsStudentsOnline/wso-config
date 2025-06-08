@@ -17,9 +17,9 @@
     direction: in
     interface: lo
 
-- name: Allow SSH (rate limited)
+- name: Allow SSH
   community.general.ufw:
-    rule: limit
+    rule: allow
     port: 22
     proto: tcp
 
