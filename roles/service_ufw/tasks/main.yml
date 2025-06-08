@@ -44,32 +44,41 @@
     rule: allow
     port: 3000
     proto: tcp
+    from_ip: 192.168.1.0/24 # local
 
 - name: Allow Prometheus
   ufw:
     rule: allow
     port: 9090
     proto: tcp
+    from_ip: 192.168.1.0/24 # local
 
-- name: Allow mailman web interface
+- name: Allow Webmin
+  ufw:
+    rule: allow
+    port: 10000
+    proto: tcp
+    from_ip: 192.168.1.0/24 # local
+
+- name: Allow Mailman web interface
   ufw:
     rule: allow
     port: 8000
     proto: tcp
 
-- name: Allow mailman SMTP (inbound mail)
+- name: Allow Mailman SMTP (inbound mail)
   ufw:
     rule: allow
     port: 25
     proto: tcp
 
-- name: Allow mailman submission (auth SMTP)
+- name: Allow Mailman submission (auth SMTP)
   ufw:
     rule: allow
     port: 587
     proto: tcp
 
-- name: Allow mailman IMAP/POP (if we're hosting mailboxes)
+- name: Allow Mailman IMAP/POP (if we're hosting mailboxes)
   ufw:
     rule: allow
     port: 993
