@@ -1,0 +1,83 @@
+##### WSO-Config WSO 2.0 #####
+# Note that you'll need to build by hand and /usr/src/linux
+# always points to the right directory.
+
+# To build, run:
+# cd /usr/src/linux
+# make olddefconfig
+# make -j$(nproc)
+
+- name: Install kernel build dependencies
+  package:
+    name:
+      - gcc
+      - make
+      - bc
+      - bison
+      - flex
+      - elfutils-libelf-devel
+      - openssl-devel
+      - ncurses-devel
+      - wget
+      - tar
+    state: present
+
+- name: Fetch latest stable kernel version
+  shell: curl -s https://www.kernel.org/releases.json | jq -r '.latest_stable.version'
+  register: latest_kernel
+  changed_when: false
+
+- name: Set kernel facts
+  set_fact:
+    kernel_version: "{{ latest_kernel.stdout }}"
+    kernel_major: "{{ latest_kernel.stdout.split('.')[0] }}"
+    kernel_tarball: "linux-{{ latest_kernel.stdout }}.tar.xz"
+    kernel_url: "https://cdn.kernel.org/pub/linux/kernel/v{{ latest_kernel.stdout.split('.')[0] }}.x/linux-{{ latest_kernel.stdout }}.tar.xz"
+    kernel_dir: "/usr/src/linux-{{ latest_kernel.stdout }}"
+
+- name: Check if kernel source dir exists
+  stat:
+    path: "{{ kernel_dir }}"
+  register: kernel_dir_status
+
+- name: Download kernel tarball if new
+  get_url:
+    url: "{{ kernel_url }}"
+    dest: "/usr/src/{{ kernel_tarball }}"
+    mode: '0644'
+  when: not kernel_dir_status.stat.exists
+  register: kernel_tarball_downloaded
+
+- name: Extract kernel source
+  unarchive:
+    src: "/usr/src/{{ kernel_tarball }}"
+    dest: "/usr/src"
+    remote_src: yes
+  when: kernel_tarball_downloaded is defined and kernel_tarball_downloaded.changed
+
+- name: Symlink /usr/src/linux to extracted kernel
+  file:
+    src: "{{ kernel_dir }}"
+    dest: "/usr/src/linux"
+    state: link
+    force: true
+  when: kernel_tarball_downloaded is defined and kernel_tarball_downloaded.changed
+
+- name: Get running kernel version
+  shell: uname -r
+  register: running_kernel
+  changed_when: false
+
+- name: Copy current boot config to new kernel .config
+  copy:
+    src: "/boot/config-{{ running_kernel.stdout }}"
+    dest: "{{ kernel_dir }}/.config"
+    remote_src: yes
+  when: kernel_tarball_downloaded is defined and kernel_tarball_downloaded.changed
+
+- name: Run make olddefconfig (best effort, might fail)
+  shell: make olddefconfig
+  args:
+    chdir: "{{ kernel_dir }}"
+  when: kernel_tarball_downloaded is defined and kernel_tarball_downloaded.changed
+  ignore_errors: true
