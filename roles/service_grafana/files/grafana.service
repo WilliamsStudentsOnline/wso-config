@@ -10,6 +10,7 @@ After=prometheus.service prometheus-node-exporter.service
 Environment="GF_DATABASE_PATH=/var/lib/grafana/grafana.db"
 # uncomment if you need this
 #EnvironmentFile=/etc/default/grafana
+# TODO: we need to use this as the Grafana user, but that complicates things
 User=root
 Group=root
 Type=simple

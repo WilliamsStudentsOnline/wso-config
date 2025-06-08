@@ -12,6 +12,15 @@
     state: present
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
+# TODO: when we get SSL running on server, probs turn this off
+# TODO: Webmin's default SSL cert is very broken. We'll need to fix that in the future
+- name: Disable mandatory SSL requirement
+  ansible.builtin.lineinfile:
+    path: /etc/webmin/miniserv.conf
+    regexp: '^ssl='
+    line: 'ssl=0'
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
+
 - name: Enable and start webmin
   systemd:
     name: webmin
