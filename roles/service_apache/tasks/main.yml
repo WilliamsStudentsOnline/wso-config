@@ -1,0 +1,12 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install apache
+  dnf:
+    name: httpd
+    state: present
+
+- name: Enable and start apache
+  systemd:
+    name: httpd
+    enabled: yes
+    state: started
