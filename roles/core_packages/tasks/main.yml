@@ -1,6 +1,7 @@
 ##### WSO-Config WSO 2.0 #####
 
 # installs all the things not included, but that one expects to have
+# kernel compilation packages are installed in fresh_kernel, not here
 - name: Install core packages
   ansible.builtin.dnf:
     name: "{{ core_packages }}"
@@ -19,6 +20,7 @@
       - tree
       - setools
       - fuse
+      - neofetch
 
 # define these in the host_vars section
 - name: Install machine-specific packages
