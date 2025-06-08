@@ -13,6 +13,13 @@
     mode: '0755'
   when: inventory_hostname == 'wso_backup'
 
+- name: Create backup directory (prod server)
+  ansible.builtin.file:
+    path: /backup
+    state: directory
+    mode: '0755'
+  when: inventory_hostname == 'wso_prod'
+
 - name: Generate Borg ssh keypair for root
   command: ssh-keygen -t ed25519 -f /root/.ssh/borg_key -N ''
   args:
@@ -79,30 +86,41 @@
         IdentitiesOnly yes
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
-# - name: Mount production server on remote
-#   ansible.posix.mount:
-#     path: /remote
-#     src: wso-prod:/
-#     fstype: fuse.sshfs
-#     #opts: allow_other,IdentityFile=/root/.ssh/id_rsa
-#     state: mounted
+- name: enable user_allow_other in fuse.conf
+  lineinfile:
+    path: /etc/fuse.conf
+    regexp: '^#?user_allow_other'
+    line: 'user_allow_other'
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+
+# - name: deploy sshfs mount on backup (mounts prod:/ -> /remote)
+#   template:
+#     src: sshfs-automount.service.j2
+#     dest: /etc/systemd/system/remote.mount
+#     mode: '0644'
+#   vars:
+#     remote_host: "{{ hostvars['wso_prod'].host_name }}"
+#     remote_path: "/"
+#     local_path: "/remote"
 #   when: inventory_hostname == 'wso_backup'
 
-# - name: Mount backup server on prod
-#   ansible.posix.mount:
-#     path: /backup
-#     src: wso-backup:/backup
-#     fstype: fuse.sshfs
-#     #opts: allow_other,IdentityFile=/root/.ssh/id_rsa
-#     state: mounted
+# - name: deploy sshfs mount on prod (mounts backup:/backup -> /backup)
+#   template:
+#     src: sshfs-automount.service.j2
+#     dest: /etc/systemd/system/backup.mount
+#     mode: '0644'
+#   vars:
+#     remote_host: "{{ hostvars['wso_backup'].host_name }}"
+#     remote_path: "/backup"
+#     local_path: "/backup"
 #   when: inventory_hostname == 'wso_prod'
 
-- name: Create backup directory (prod server)
-  ansible.builtin.file:
-    path: /backup
-    state: directory
-    mode: '0755'
-  when: inventory_hostname == 'wso_prod'
+# - name: enable and start sshfs mount unit
+#   systemd:
+#     name: "{{ local_path | regex_replace('^/', '') }}.mount"
+#     enabled: yes
+#     state: started
+#   when: local_path is defined
 
 - name: Copy backup shell script
   ansible.builtin.copy:
