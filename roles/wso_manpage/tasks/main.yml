@@ -12,7 +12,7 @@
 
 - name: Compress man page for wso-backend
   # assuming it's bash? who knows
-  shell: |
+  ansible.builtin.shell: |
    if [ -f /usr/local/share/man/man1/wso-backend.1.gz ]; then
     rm /usr/local/share/man/man1/wso-backend.1.gz
    fi
