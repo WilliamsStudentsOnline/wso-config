@@ -15,14 +15,20 @@
     reload: yes
   loop: "{{ sysctl_hardening }}"
 
-  # enable this for security reasons
-- name: Install auditd
-  dnf:
-    name: audit
-    state: present
+- name: Harden weak permissions
+  shell: chmod 700 /boot /usr/src /lib/modules /usr/lib/modules
 
-- name: Enable auditd
-  systemd:
-    name: auditd
-    enabled: yes
-    state: started
+- name: Harden loadable kernel modules
+  ansible.builtin.copy:
+  # this list needs to be manually checked if you're doing something weird
+    src: module-blacklist
+    dest: /etc/modprobe.d/blacklist
+    mode: 0700
+
+# TODO: tighten security on PAM and /etc/shadow. we need more secure password gen
+    
+
+
+
+
+

@@ -16,6 +16,7 @@
 
     # services
     - service_auditd
+    - service_jitterentropy
     - service_zram
     - service_ufw
     - service_fail2ban
