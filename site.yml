@@ -15,20 +15,22 @@
 
     # services
     - service_auditd
-    - service_jitterentropy
+    - service_haveged
     - service_zram
     - service_ufw
     - service_fail2ban
     - service_backup
     - service_dnfauto
     - service_apache
-    #- service_clamd
     - service_webmin
     - service_grafana
     - service_prometheus
     - service_mailman3
     - service_mysql
     - service_oomd
+    
+    # service_clamd exists, but is highly buggy and is thus removed.
+    # if you want to use it, you'll need to fix it yourself.
 
     # wso software
     - wso_cronjobs

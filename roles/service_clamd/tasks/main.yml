@@ -12,17 +12,16 @@
 
 - name: Ensure clamd config exists
   ansible.builtin.copy:
-    src: /etc/clamd.d/scan.conf
+    src: scan.conf
     dest: /etc/clamd.d/scan.conf
-    remote_src: yes
     force: no
     
-- name: Ensure freshclam config exists
-  ansible.builtin.copy:
-    src: /etc/freshclam.conf
-    dest: /etc/freshclam.conf
-    remote_src: yes
-    force: no
+# - name: Ensure freshclam config exists
+#   ansible.builtin.copy:
+#     src: /etc/freshclam.conf
+#     dest: /etc/freshclam.conf
+#     remote_src: yes
+#     force: no
 
 - name: Create virus database dir
   ansible.builtin.file:
