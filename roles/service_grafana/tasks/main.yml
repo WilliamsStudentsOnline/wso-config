@@ -4,39 +4,47 @@
   ansible.builtin.get_url:
     url: https://rpm.grafana.com/gpg.key
     dest: /tmp/grafana-gpg.key
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Import Grafana GPG signing key
   ansible.builtin.shell: sudo rpm --import /tmp/grafana-gpg.key
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Copy Grafana repository
   ansible.builtin.copy:
     src: grafana.repo
     force: yes
     dest: /etc/yum.repos.d/grafana.repo
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Update DNF cache after adding repo
   ansible.builtin.dnf:
     update_cache: yes
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Install Grafana
   ansible.builtin.dnf:
     name: grafana
     state: present
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Copy Grafana service file
   ansible.builtin.copy:
     src: grafana.service
     force: yes
     dest: /usr/lib/systemd/system/
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Refresh systemd service file cache
   ansible.builtin.shell: systemctl daemon-reload
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Copy Grafana configuration file
   ansible.builtin.copy:
     src: grafana-config.ini
     force: yes
     dest: /etc/grafana/
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 # TODO: apparently you can do this in Ansible nowadays,
 # so we should stop doing it this old-fashioned way.
@@ -45,11 +53,13 @@
     src: grafana.db
     force: yes
     dest: /var/lib/grafana/
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Enable and start Grafana
   systemd:
     name: grafana
     enabled: yes
     state: started
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
     
   

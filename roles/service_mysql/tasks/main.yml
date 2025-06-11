@@ -6,10 +6,12 @@
   dnf:
     name: mysql-server
     state: present
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Enable and start mysqld
   systemd:
     name: mysqld
     enabled: yes
     state: started
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
     
