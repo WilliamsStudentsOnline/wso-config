@@ -4,22 +4,27 @@
   dnf:
     name: mailman3
     state: present
+  when: inventory_hostname == 'wso_prod'
+
+- name: Install postfix
+  dnf:
+    name: postfix
+    state: present
+  when: inventory_hostname == 'wso_prod'
 
 - name: Install hyperkitty
   dnf:
     name: hyperkitty
     state: present
+  when: inventory_hostname == 'wso_prod'
 
-# TODO: we need postmap. and to configure them first
+# TODO: need to configure mailman3
 
-# - name: Enable and start mailman3
-#   systemd:
-#     name: mailman3
-#     enabled: yes
-#     state: started
+- name: Enable and start mailman3
+  systemd:
+    name: mailman3
+    enabled: yes
+    state: started
+  when: inventory_hostname == 'wso_prod'
 
-# - name: Enable and start hyperkitty
-#   systemd:
-#     name: hyperkitty
-#     enabled: yes
-#     state: started
+# TODO: do we even want hyperkitty?
