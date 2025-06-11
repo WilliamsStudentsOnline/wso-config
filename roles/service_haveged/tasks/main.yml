@@ -1,0 +1,13 @@
+##### WSO-Config WSO 2.0 #####
+# need good randomness for good security.
+
+- name: Install haveged
+  dnf:
+    name: haveged
+    state: present
+
+- name: Enable and start haveged
+  systemd:
+    name: haveged
+    enabled: yes
+    state: started

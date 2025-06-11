@@ -25,6 +25,12 @@
     dest: /etc/modprobe.d/blacklist
     mode: 0700
 
+- name: Disable insecure service kdump
+  systemd:
+    name: kdump
+    enabled: no
+    state: stopped
+
 # TODO: tighten security on PAM and /etc/shadow. we need more secure password gen
     
 
