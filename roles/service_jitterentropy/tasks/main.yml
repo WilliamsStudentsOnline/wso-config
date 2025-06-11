@@ -1,0 +1,16 @@
+##### WSO-Config WSO 2.0 #####
+# need good randomness for good security.
+
+- name: Install jitterentropy
+  dnf:
+    name: jitterentropy
+    state: present
+
+- name: Enable and start jitterentropy
+  systemd:
+    name: jitterentropy
+    enabled: yes
+    state: started
+
+- name: Load kernel module for jitterentropy
+  shell: insmod jitterentropy_rng
