@@ -32,6 +32,9 @@
   ansible.builtin.copy:
     src: grafana.service
     force: yes
+    mode: '0755'
+    group: 'grafana'
+    owner: 'grafana'
     dest: /usr/lib/systemd/system/
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
@@ -43,6 +46,9 @@
   ansible.builtin.copy:
     src: grafana-config.ini
     force: yes
+    mode: '0755'
+    group: 'grafana'
+    owner: 'grafana'
     dest: /etc/grafana/
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
@@ -52,7 +58,18 @@
   ansible.builtin.copy:
     src: grafana.db
     force: yes
+    mode: '0755'
+    group: 'grafana'
+    owner: 'grafana'
     dest: /var/lib/grafana/
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+
+- name: Unbreak Grafana permissions
+  shell: chmod -R u+rwX /var/lib/grafana
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+
+- name: Unbreak Grafana SELinux permissions
+  shell: restorecon -Rv /var/lib/grafana
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Enable and start Grafana
