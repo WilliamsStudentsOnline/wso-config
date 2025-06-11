@@ -6,7 +6,6 @@
   become: yes
   roles:
     # essential configuration
-    - service_backup
     - branding
     - ensure_packages
     - core_packages
@@ -20,7 +19,7 @@
     - service_zram
     - service_ufw
     - service_fail2ban
-
+    - service_backup
     - service_dnfauto
     - service_apache
     #- service_clamd

@@ -6,13 +6,9 @@ sysctl_hardening:
   - { key: kernel.kptr_restrict, value: 2 } # no more kernel pointers
   - { key: kernel.randomize_va_space, value: 2 } # randomize memory
   - { key: kernel.dmesg_restrict, value: 1 } # no more dmesg without root
-  #- { key: kernel.unprivileged_bpf_disabled, value: 1 } # check to see if we can use this
-  #- { key: net.core.bpf_jit_harden, value: 2 } # again, might break things
   - { key: dev.tty.ldisc_autoload, value: 0 } # disable weird old vulnerable feature
   - { key: kernel.kexec_load_disabled, value: 1 } # may want to disable if kexec speeds up boots
   - { key: kernel.sysrq, value: 0 } # nobody should be able to use it
-  - { key: kernel.ipv4.tcp_syncookies, value: 1 } # prevent SYN flood attacks
-  - { key: kernel.ipv4.tcp_rfc1337, value: 1 } # stop time wait assassinations
   - { key: net.ipv4.conf.all.rp_filter, value: 1 } # stop IP spoofing
   - { key: net.ipv4.conf.default.rp_filter, value: 1 } # stop IP spoofing
   - { key: net.ipv4.icmp_echo_ignore_broadcasts, value: 1 } # no ping! turn on if needed
@@ -24,13 +20,9 @@ sysctl_hardening:
   - { key: net.ipv4.conf.default.secure_redirects, value: 0 } # disable ICMP redirects
   - { key: net.ipv6.conf.all.accept_redirects, value: 0 } # disable ICMP redirects
   - { key: net.ipv6.conf.default.accept_redirects, value: 0 } # disable ICMP redirects
-  - { key: net.ipv4.tcp_sack, value: 0 } # no TCP sack
-  - { key: net.ipv4.tcp_dsack, value: 0 }  # no TCP sack
-  - { key: net.ipv4.tcp_fack, value: 0 }  # no TCP sack
   - { key: net.ipv4.tcp_timestamps, value: 0 }  # no TCP timestamps, they're a privacy risk
   - { key: kernel.yama.ptrace_scope, value: 2 } # only very select processes can ptrace
   - { key: vm.mmap_rnd_bits, value: 32 } # increase ASLR memory protection
-  - { key: vm.mmap_rnd_compat_bits, value: 16 } # increase ASLR memory protection
   - { key: fs.protected_symlinks, value: 1 } # no symlinks in dangerous directories
   - { key: fs.protected_hardlinks, value: 1 } # no symlinks in dangerous directories
   
