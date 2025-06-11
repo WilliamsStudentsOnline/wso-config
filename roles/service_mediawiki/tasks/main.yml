@@ -44,7 +44,7 @@
     dest: /srv/wiki/html
     state: link
     force: no
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Set permissions with shell (recursive chown)
   shell: chown -R apache:apache /srv/wiki/html
