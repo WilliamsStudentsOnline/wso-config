@@ -28,6 +28,7 @@
     - service_mailman3
     - service_mysql
     - service_oomd
+    - service_jenkins
     
     # service_clamd exists, but is highly buggy and is thus removed.
     # if you want to use it, you'll need to fix it yourself.
