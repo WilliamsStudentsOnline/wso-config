@@ -67,30 +67,42 @@
     rule: allow
     port: 8080
     proto: tcp
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Allow Mailman web interface
   ufw:
     rule: allow
     port: 8000
     proto: tcp
+  when: inventory_hostname == 'wso_prod'
 
 - name: Allow Mailman SMTP (inbound mail)
   ufw:
     rule: allow
     port: 25
     proto: tcp
+  when: inventory_hostname == 'wso_prod'
 
 - name: Allow Mailman submission (auth SMTP)
   ufw:
     rule: allow
     port: 587
     proto: tcp
+  when: inventory_hostname == 'wso_prod'
 
 - name: Allow Mailman IMAP/POP (if we're hosting mailboxes)
   ufw:
     rule: allow
     port: 993
     proto: tcp
+  when: inventory_hostname == 'wso_prod'
+
+- name: Allow Minecraft
+  ufw:
+    rule: allow
+    port: 25565
+    proto: tcp
+  when: inventory_hostname == 'wso_prod'
 
 - name: Enable and start ufw job
   systemd:

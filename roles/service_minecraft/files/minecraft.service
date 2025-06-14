@@ -1,0 +1,17 @@
+[Unit]
+Description=Minecraft Server
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/minecraft
+User=mc
+Restart=on-failure
+ExecStart=/opt/minecraft/start.sh
+Nice=10
+IOSchedulingClass=2
+IOSchedulingPriority=7
+CPUQuota=50%
+MemoryMax=4096M
+
+[Install]
+WantedBy=multi-user.target

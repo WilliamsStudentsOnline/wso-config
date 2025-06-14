@@ -1,0 +1,149 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install dependencies
+  dnf:
+    name: java-21-openjdk-headless
+    state: present
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Minecraft user for security
+  user:
+     name: mc
+     comment: Minecraft Server User
+     uid: 2011 # year minecraft 1.0.0 released
+     shell: /bin/false
+     home: /opt/minecraft
+     create_home: yes
+     skeleton: "" # never logged into so no need for it
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Minecraft directories
+  file:
+    path: /opt/minecraft/plugins
+    state: directory
+    owner: mc
+    recurse: yes
+  when: inventory_hostname == 'wso_prod'
+
+- name: Download Paper JAR
+  get_url:
+  # TODO: update this when Paper drops 1.21.5, then we're never updating again (too much work)
+    url: https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/232/downloads/paper-1.21.4-232.jar
+    dest: /opt/minecraft/paper.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
+# TODO: check all of these plugins before any update!
+
+- name: Download Spark plugin
+  get_url:
+    url: https://ci.lucko.me/job/spark/487/artifact/spark-bukkit/build/libs/spark-1.10.138-bukkit.jar
+    dest: /opt/minecraft/plugins/spark.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
+- name: Download Chunky plugin
+  get_url:
+    url: https://cdn.modrinth.com/data/fALzjamp/versions/SmZRkQyR/Chunky-Bukkit-1.4.36.jar
+    dest: /opt/minecraft/plugins/chunky.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
+- name: Download Chunky worldborder plugin
+  get_url:
+    url: https://cdn.modrinth.com/data/s86X568j/versions/asaBBItO/ChunkyBorder-Bukkit-1.2.23.jar
+    dest: /opt/minecraft/plugins/chunky-border.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
+- name: Download ViaVersion plugin
+  get_url:
+    url: https://cdn.modrinth.com/data/P1OZGk5p/versions/cdC9vQSF/ViaVersion-5.3.2.jar
+    dest: /opt/minecraft/plugins/viaversion.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
+- name: Download MiniMOTD plugin
+  get_url:
+    url: https://cdn.modrinth.com/data/16vhQOQN/versions/SgOOeke0/minimotd-bukkit-2.1.5.jar
+    dest: /opt/minecraft/plugins/mini-motd.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+  
+- name: Create MiniMOTD directories
+  file:
+    path: /opt/minecraft/plugins/MiniMOTD/icons
+    state: directory
+    owner: mc
+    recurse: yes
+  when: inventory_hostname == 'wso_prod'
+
+- name: Copy MiniMOTD main config file
+  copy:
+    src: minimotd_main.conf
+    force: yes
+    dest: /opt/minecraft/plugins/MiniMOTD/main.conf
+  when: inventory_hostname == 'wso_prod'
+
+- name: Copy MiniMOTD secondary config file
+  copy:
+    src: minimotd_plugin_settings.conf
+    force: yes
+    dest: /opt/minecraft/plugins/MiniMOTD/plugin_settings.conf
+  when: inventory_hostname == 'wso_prod'
+
+- name: Copy MiniMOTD icon
+  copy:
+    src: ephelia_face_smol.png
+    force: yes
+    dest: /opt/minecraft/plugins/MiniMOTD/icons/
+  when: inventory_hostname == 'wso_prod'
+
+- name: Download CoreProtect plugin
+  get_url:
+    url: https://cdn.modrinth.com/data/Lu3KuzdV/versions/llmrc4cl/CoreProtect-22.4.jar
+    dest: /opt/minecraft/plugins/core-protect.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
+# Unfortunately, you'll need to add your own datapacks.
+
+- name: Accept Minecraft EULA
+  copy:
+    dest: /opt/minecraft/eula.txt
+    content: "eula=true\n"
+    force: yes
+    owner: mc
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Minecraft launch script
+  copy:
+    src: start.sh
+    dest: /opt/minecraft/start.sh
+    mode: 0755
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Minecraft server properties
+  copy:
+    src: server.properties
+    dest: /opt/minecraft/server.properties
+    force: no
+    mode: 0755
+  when: inventory_hostname == 'wso_prod'
+
+- name: Copy Minecraft systemd service
+  copy:
+    src: minecraft.service
+    force: yes
+    dest: /usr/lib/systemd/system/minecraft.service
+  when: inventory_hostname == 'wso_prod'
+
+# TODO: switch this on for prod, but on test VMs it's too intensive
+
+# - name: Enable and start Minecraft
+#   systemd:
+#     name: minecraft
+#     enabled: yes
+#     state: started
+#   when: inventory_hostname == 'wso_prod'
+
