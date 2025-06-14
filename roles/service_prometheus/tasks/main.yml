@@ -1,10 +1,5 @@
 ##### WSO-Config WSO 2.0 #####
 
-- name: Create Prometheus directory
-  ansible.builtin.file:
-    path: /root/ansible/prometheus
-    state: directory
-
 # I don't know why they're named so weirdly
 - name: Install Prometheus
   ansible.builtin.dnf:
