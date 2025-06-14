@@ -15,9 +15,18 @@
     update_cache: yes
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
+- name: Ensure proper subdirs exist
+  file:
+    path: /srv/www/
+    state: directory
+    owner: apache
+    group: apache
+    mode: '0755'
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
+
 - name: Create MediaWiki directory
   file:
-    path: /srv/wiki
+    path: /srv/www/wiki
     state: directory
     owner: apache
     group: apache
@@ -33,43 +42,45 @@
 - name: Extract MediaWiki
   unarchive:
     src: /tmp/mediawiki.tar.gz
-    dest: /srv/wiki
+    dest: /srv/www/wiki
     remote_src: yes
-    creates: /srv/wiki/mediawiki-1.41.1
+    creates: /srv/www/wiki/mediawiki-1.41.1
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Symlink MediaWiki to a clean path
   file:
-    src: /srv/wiki/mediawiki-1.41.1
-    dest: /srv/wiki/html
+    src: /srv/www/wiki/mediawiki-1.41.1
+    dest: /srv/www/wiki/html
     state: link
     force: no
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Set permissions with shell (recursive chown)
-  shell: chown -R apache:apache /srv/wiki/html
+  shell: chown -R apache:apache /srv/www/wiki/html
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Set SELinux context on /srv and subdirs for Apache
   ansible.builtin.command: semanage fcontext -a -t httpd_sys_content_t "{{ item }}(/.*)?"
   loop:
     - /srv
-    - /srv/wiki
+    - /srv/www
+    - /srv/www/wiki
   changed_when: false
   ignore_errors: yes  # semanage errors if already exists
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Restore SELinux context on /srv and subdirs
-  ansible.builtin.command: restorecon -Rv /srv /srv/wiki
+  ansible.builtin.command: restorecon -Rv /srv /srv/www /srv/www/wiki
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
-- name: Ensure /srv and /srv/wiki have o+x for Apache directory access
+- name: Ensure /srv/www/wiki has o+x for Apache directory access
   ansible.builtin.file:
     path: "{{ item }}"
     mode: '0755'
   loop:
     - /srv
-    - /srv/wiki
+    - /srv/www
+    - /srv/www/wiki
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Enable Apache access boolean for user content
@@ -80,12 +91,13 @@
 - name: Deploy Apache vhost
   copy:
     dest: /etc/httpd/conf.d/wiki.conf
+    force: yes
     content: |
       <VirtualHost *:80>
           ServerName localhost
-          DocumentRoot /srv/wiki/html
+          DocumentRoot /srv/www/wiki/html
 
-          <Directory /srv/wiki/html>
+          <Directory /srv/www/wiki/html>
               AllowOverride All
               Require all granted
           </Directory>
