@@ -33,7 +33,7 @@
     mode: '0755'
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
-- name: download MediaWiki
+- name: Download MediaWiki
   get_url:
     url: https://releases.wikimedia.org/mediawiki/1.41/mediawiki-1.41.1.tar.gz
     dest: /tmp/mediawiki.tar.gz
