@@ -30,6 +30,7 @@
     - service_oomd
     - service_jenkins
     - service_mediawiki
+    - service_cachet
     - service_minecraft # TODO: edit on prod
     
     # service_clamd exists, but is highly buggy and is thus removed.

@@ -1,0 +1,128 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install dependencies
+  ansible.builtin.dnf:
+    name:
+     - php
+     - composer
+    state: present
+  when: inventory_hostname == 'wso_backup'
+
+- name: Ensure proper subdirs exist
+  file:
+    path: /srv/www/
+    state: directory
+    owner: apache
+    group: apache
+    mode: '0755'
+  when: inventory_hostname == 'wso_backup'
+
+- name: Git checkout Cachet
+  ansible.builtin.git:
+    repo: 'https://github.com/cachethq/Cachet.git'
+    dest: /srv/www/cachet
+    update: no
+  when: inventory_hostname == 'wso_backup'
+
+- name: Set permissions with shell (recursive chown)
+  shell: chown -R apache:apache /srv/www/cachet
+  when: inventory_hostname == 'wso_backup'
+
+- name: Set SELinux context on /srv and subdirs for Apache
+  ansible.builtin.command: semanage fcontext -a -t httpd_sys_content_t "{{ item }}(/.*)?"
+  loop:
+    - /srv
+    - /srv/www
+    - /srv/www/cachet
+  changed_when: false
+  ignore_errors: yes  # semanage errors if already exists
+  when: inventory_hostname == 'wso_backup'
+
+- name: Restore SELinux context on /srv and subdirs
+  ansible.builtin.command: restorecon -Rv /srv /srv/www /srv/www/cachet
+  when: inventory_hostname == 'wso_backup'
+  
+- name: Ensure /srv/www/wiki has o+x for Apache directory access
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: '0755'
+  loop:
+    - /srv
+    - /srv/www
+    - /srv/www/cachet
+  when: inventory_hostname == 'wso_backup'
+
+- name: Enable Apache access boolean for user content
+  ansible.builtin.command: setsebool -P httpd_read_user_content 1
+  when: inventory_hostname == 'wso_backup'
+
+# I don't know WHY it's broken but this fixes it
+- name: Fix SELinux perms in Cachet
+  shell: |
+   semanage fcontext -a -t httpd_sys_rw_content_t "/srv/www/cachet/storage(/.*)?"
+   semanage fcontext -a -t httpd_sys_rw_content_t "/srv/www/cachet/bootstrap/cache(/.*)?"
+   semanage fcontext -a -t httpd_sys_rw_content_t "/srv/www/cachet/database(/.*)?"
+   restorecon -Rv /srv/www/cachet/
+   chown apache:apache /srv/www/cachet/database
+   chmod -R 777 /srv/www/cachet/storage
+   chmod -R 777 /srv/www/cachet/bootstrap
+  when: inventory_hostname == 'wso_backup' 
+
+- name: Copy Cachet config file
+  copy:
+    src: env-file
+    force: yes
+    dest: /srv/www/cachet/.env
+    mode: 0644
+    owner: apache
+    group: apache
+  when: inventory_hostname == 'wso_backup'
+
+# TODO: change this in production
+- name: Deploy Cachet vhost
+  copy:
+    dest: /etc/httpd/conf.d/cachet.conf
+    force: yes
+    content: |
+      <VirtualHost *:80>
+          ServerName localhost
+          DocumentRoot /srv/www/cachet/public
+
+          <Directory /srv/www/cachet/public>
+              Options Indexes FollowSymLinks
+              AllowOverride All
+              Require all granted
+          </Directory>
+
+          ErrorLog /var/log/httpd/cachet_error.log
+          CustomLog /var/log/httpd/cachet_access.log combined
+      </VirtualHost>
+  when: inventory_hostname == 'wso_backup'
+
+- name: Restart Apache
+  systemd:
+    name: httpd
+    state: restarted
+  when: inventory_hostname == 'wso_backup'
+
+# note that this runs as the apache user!
+- name: Create Cachet cronjob
+  when: inventory_hostname == 'wso_backup'
+  ansible.builtin.cron:
+    name: "Refresh Cachet"
+    user: apache
+    disabled: true
+    minute: "*"
+    job: "/bin/bash -l -c 'php /path/to/cachet/artisan schedule:run >> /dev/null'"
+
+# note that cachet doesn't have its own systemd daemon. it's a static site served by apache.
+
+# Things you will still need to do:
+# (also, make sure you do all tasks using sudo -u apache)
+
+# - steps 4-10 on this page: https://docs.cachethq.io/v3.x/installation
+# - enable the scheduler by uncommenting the cron job
+# - go into Cachet's web GUI and fix it
+
+
+
