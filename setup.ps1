@@ -23,11 +23,11 @@ $isoPath = Join-Path $PWD $isoName
 function Install-Ansible {
     Write-Host "[setup.ps1] Trying to install Ansible..."
     if (Get-Command winget -ErrorAction SilentlyContinue) {
-	Write-Host "[setup.ps1] Please approve the installation on the next prompt."
-        winget install --id RedHat.Ansible -e
+	Write-Host "[setup.ps1] WinGet is installed on your machine. You will need to install Ansible manually. As of June 2025, Microsoft has removed the package. Consider installing choco instead if you want this handled automatically."
     } elseif (Get-Command choco -ErrorAction SilentlyContinue) {
 	Write-Host "[setup.ps1] Please approve the installation on the next prompt."
         choco install ansible
+	ansible-galaxy collection install community.general
     } else {
         Write-Error "[setup.ps1] No package manager found. Install winget or choco, or install Ansible manually."
         exit 1
@@ -36,8 +36,8 @@ function Install-Ansible {
 
 function Download-Iso {
     switch ($archString) {
-	"x86_64" { $isoUrl = "https://repo.almalinux.org/almalinux/9/isos/x86_64/AlmaLinux-9-latest-x86_64-dvd.iso" }
-	"arm64" { $isoUrl = "https://repo.almalinux.org/almalinux/9/isos/aarch64/AlmaLinux-9-latest-aarch64-dvd.iso" }
+	"x86_64" { $isoUrl = "https://repo.almalinux.org/almalinux/10/isos/x86_64/AlmaLinux-10.0-x86_64-minimal.iso" }
+	"arm64" { $isoUrl = "https://repo.almalinux.org/almalinux/10/isos/aarch64/AlmaLinux-10.0-aarch64-minimal.iso" }
 	default { Write-Error "[setup.ps1] Unsupported arch: $archString"; exit 1 }
     }
     $yn = Read-Host "[setup.ps1] ISO not found. Download AlmaLinux 9.5 for $archString? (y/N)"
@@ -58,4 +58,6 @@ if (-not (Test-Path $isoPath)) {
     
 }
 
-Write-Host "[setup.sh] Make sure to edit inventory.ini. That is how Ansible knows what host to contact, and you want to add your VMs to that list so it works."
+Write-Host "[setup.ps1] Make sure to edit inventory/hosts.ini. That is how Ansible knows what host to contact, and you want to add your VMs to that list so it works."
+
+Write-Host "[setup.ps1] Read the README in this repository for more information."

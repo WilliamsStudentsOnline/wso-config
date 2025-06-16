@@ -16,14 +16,19 @@ install_ansible() {
     echo "[setup.sh] Ansible is not installed. Attempting an install..."
     if command -v apt-get &>/dev/null; then
         sudo apt-get install -y ansible
+	ansible-galaxy collection install community.general
     elif command -v brew &>/dev/null; then
         brew install ansible
+	ansible-galaxy collection install community.general
     elif command -v pacman &>/dev/null; then
         sudo pacman -S ansible
+	ansible-galaxy collection install community.general
     elif command -v dnf &>/dev/null; then
         sudo dnf install ansible
+	ansible-galaxy collection install community.general
     elif command -v zypper &>/dev/null; then
         sudo zypper install ansible
+	ansible-galaxy collection install community.general
     else
 	echo "[setup.sh] Couldn't find a package manager even though I tried (maybe you use something weird or your shell is broken?)."
         echo "[setup.sh] No viable Ansible installation method. Quitting..."
@@ -33,9 +38,9 @@ install_ansible() {
 
 download_iso() {
     if [[ "$ARCH" == "x86_64" ]]; then
-	ISO_URL="https://repo.almalinux.org/almalinux/9.5/isos/x86_64/AlmaLinux-9.5-x86_64-boot.iso"
+	ISO_URL="https://repo.almalinux.org/almalinux/10/isos/x86_64/AlmaLinux-10.0-x86_64-minimal.iso"
     elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
-	ISO_URL="https://repo.almalinux.org/almalinux/9.5/isos/x86_64/AlmaLinux-9.5-aarch64-boot.iso"
+	ISO_URL="https://repo.almalinux.org/almalinux/10/isos/aarch64/AlmaLinux-10.0-aarch64-minimal.iso"
     else
 	echo "[setup.sh] Unsupported arch: $ARCH"; exit 1
     fi
@@ -56,5 +61,5 @@ if [[ ! -f "$PWD/AlmaLinux-9.5-$ARCH-boot.iso" ]]; then
     download_iso
 fi
 
-echo "[setup.sh] Make sure to edit inventory.ini. That is how Ansible knows what host to contact, and you want to add your VMs to that list so it works."
+echo "[setup.sh] Make sure to edit inventory/hosts.ini. That is how Ansible knows what host to contact, and you want to add your VMs to that list so it works."
 
