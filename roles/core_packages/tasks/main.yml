@@ -15,13 +15,11 @@
       - wget
       - git
       - htop
-      - atop
       - ftp
       - tree
       - setools
       - fuse
-      - redis
-      - neofetch
+      - fastfetch
 
 # define these in the host_vars section
 - name: Install machine-specific packages

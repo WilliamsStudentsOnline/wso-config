@@ -5,6 +5,14 @@
     name: zram-generator
     state: present
 
+- name: Load zram kernel module
+  shell: modprobe zram
+
+- name: Ensure zram stays on
+  copy:
+    dest: /etc/modules-load.d/zram.conf
+    content: "zram"
+        
 - name: Configure zram block devices
   ansible.builtin.copy:
     src: zram_generator.conf

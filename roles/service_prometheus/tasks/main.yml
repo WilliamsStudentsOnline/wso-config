@@ -1,5 +1,7 @@
 ##### WSO-Config WSO 2.0 #####
 
+# TODO: massively broken on AlmaLinux 10
+
 # I don't know why they're named so weirdly
 - name: Install Prometheus
   ansible.builtin.dnf:

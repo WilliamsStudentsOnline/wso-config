@@ -4,7 +4,7 @@
 
 - name: Install mysql-server
   dnf:
-    name: mysql-server
+    name: mysql8.4-server
     state: present
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
