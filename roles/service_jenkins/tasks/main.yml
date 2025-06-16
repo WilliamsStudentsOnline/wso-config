@@ -5,10 +5,10 @@
     url: https://pkg.jenkins.io/redhat/jenkins.io-2023.key
     dest: /tmp/jenkins-gpg.key
 
-- name: Import Grafana GPG signing key
+- name: Import Jenkins GPG signing key
   ansible.builtin.shell: sudo rpm --import /tmp/jenkins-gpg.key
 
-- name: Copy Grafana repository
+- name: Copy Jenkins repository
   ansible.builtin.get_url:
     url: https://pkg.jenkins.io/redhat/jenkins.repo
     force: yes
