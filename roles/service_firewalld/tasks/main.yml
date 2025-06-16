@@ -1,0 +1,120 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Ensure firewalld is installed and enabled
+  ansible.builtin.dnf:
+    name: firewalld
+    state: present
+
+- name: Enable and start firewalld
+  ansible.builtin.systemd:
+    name: firewalld
+    enabled: yes
+    state: started
+
+- name: Set default zone to public
+  ansible.posix.firewalld:
+    immediate: yes
+    permanent: yes
+    state: enabled
+    zone: public
+
+- name: Set default target to DROP
+  ansible.posix.firewalld:
+    state: enabled
+    permanent: yes
+    zone: public
+    target: DROP
+
+- name: Allow loopback
+  ansible.builtin.command: >
+    firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT 0 -i lo -j ACCEPT
+
+- name: Allow SSH
+  ansible.posix.firewalld:
+    service: ssh
+    permanent: yes
+    state: enabled
+
+- name: Allow HTTP
+  ansible.posix.firewalld:
+    service: http
+    permanent: yes
+    state: enabled
+
+- name: Allow HTTPS
+  ansible.posix.firewalld:
+    service: https
+    permanent: yes
+    state: enabled
+
+- name: Allow NTP
+  ansible.posix.firewalld:
+    port: 123/udp
+    permanent: yes
+    state: enabled
+
+- name: Allow Grafana from LAN
+  ansible.posix.firewalld:
+    rich_rule: 'rule family="ipv4" source address="192.168.1.0/24" port protocol="tcp" port="3000" accept'
+    zone: public
+    permanent: yes
+    state: enabled
+
+- name: Allow Prometheus from LAN
+  ansible.posix.firewalld:
+    rich_rule: 'rule family="ipv4" source address="192.168.1.0/24" port protocol="tcp" port="9090" accept'
+    zone: public
+    permanent: yes
+    state: enabled
+
+- name: Allow Webmin from LAN
+  ansible.posix.firewalld:
+    rich_rule: 'rule family="ipv4" source address="192.168.1.0/24" port protocol="tcp" port="10000" accept'
+    zone: public
+    permanent: yes
+    state: enabled
+
+- name: Allow Jenkins
+  ansible.posix.firewalld:
+    port: 8080/tcp
+    permanent: yes
+    state: enabled
+  when: inventory_hostname in ['wso_prod', 'wso_dev']
+
+- name: Allow Mailman web interface
+  ansible.posix.firewalld:
+    port: 8000/tcp
+    permanent: yes
+    state: enabled
+  when: inventory_hostname == 'wso_prod'
+
+- name: Allow Mailman SMTP (inbound mail)
+  ansible.posix.firewalld:
+    port: 25/tcp
+    permanent: yes
+    state: enabled
+  when: inventory_hostname == 'wso_prod'
+
+- name: Allow Mailman submission (auth SMTP)
+  ansible.posix.firewalld:
+    port: 587/tcp
+    permanent: yes
+    state: enabled
+  when: inventory_hostname == 'wso_prod'
+
+- name: Allow Mailman IMAP/POP
+  ansible.posix.firewalld:
+    port: 993/tcp
+    permanent: yes
+    state: enabled
+  when: inventory_hostname == 'wso_prod'
+
+- name: Allow Minecraft
+  ansible.posix.firewalld:
+    port: 25565/tcp
+    permanent: yes
+    state: enabled
+  when: inventory_hostname == 'wso_prod'
+
+- name: Reload firewalld
+  ansible.builtin.command: firewall-cmd --reload
