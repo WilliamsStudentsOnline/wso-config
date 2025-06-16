@@ -15,12 +15,12 @@ $ ./setup.ps1
 
 The scripts can fail in some circumstances. In that case, refer to the instructions below:
 
-On macOS, run `$ brew install ansible`. 
-On Linux it's in your package manager (run `setup.sh` to have it automatically installed). 
-On Windows, get it by installing WSL, then running the Unix installation shell script (the `setup.sh` in this folder), or by running `setup.ps1`, which only works if you have `choco` installed. 
-If none of these work, you can try `pip install ansible` (works on any OS), but use a `venv` otherwise you might break your system Python.
+* On macOS, run `$ brew install ansible`. 
+* On Linux it's in your package manager (run `setup.sh` to have it automatically installed). 
+* On Windows, get it by installing WSL, then running the Unix installation shell script (the `setup.sh` in this folder), or by running `setup.ps1`, which only works if you have `choco` installed. 
+* If none of these work, you can try `pip install ansible` (works on any OS), but use a `venv` otherwise you might break your system Python.
 
-Then, go get a copy of [AlmaLinux 10](https://almalinux.org)'s ISO image if the scripts haven't downloaded it for you (you'll know they did because they'll leave a `.iso` file in this folder. 
+Then, go get a copy of [AlmaLinux 10](https://almalinux.org)'s ISO image if the scripts haven't downloaded it for you (you'll know they did because they'll leave a `.iso` file in this folder). 
 
 Do a barebones vanilla install into the VM (only `Minimal Install` selected in the packages menu). More detailed installation instructions will be added soon.
 
