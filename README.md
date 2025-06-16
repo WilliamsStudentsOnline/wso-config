@@ -2,22 +2,31 @@
 The new server setup for WSO's infrastructure.
 
 ## Onboarding
+You will need something to manage VMs. You can get [UTM](https://mac.getutm.app) on macOS or [VirtualBox](https://www.virtualbox.org) on Windows and Linux. Alternatively, use [QEMU](https://qemu.org) if you know what you're doing.
+
 Run the short script to download the ISO file and install Ansible & third party modules:
 ``` shell
 $ ./setup.sh
 ```
-Or, if you're on Windows:
+Or, if you're on Windows and not running this in WSL:
 ``` shell
 $ ./setup.ps1 
 ```
-You will need to install [Ansible](https://www.ansible.com), which you can do with
-`$ brew install ansible` on macOS, or `pip install ansible` anywhere. On Linux it's in your package manager. On Windows, get it by installing WSL, then running the Linux installation shell script.
 
-You will also need something to manage VMs. You can get [UTM](https://mac.getutm.app) on macOS or [VirtualBox](https://www.virtualbox.org) on Windows and Linux. Alternatively, use [QEMU](https://qemu.org) if you know what you're doing.
+The scripts can fail in some circumstances. In that case, refer to the instructions below:
 
-Go get a copy of [AlmaLinux 10](https://almalinux.org)'s ISO image, then do a barebones vanilla install into the VM. Install as few packages as possible! It's very difficult for Ansible to safely batch remove unneeded packages, and it will only add what is strictly needed. So rather than installing something, simply add it to this configuration. Make sure that you make **multiple** VMs by cloning that first installation, one for each role (Prod, Dev, Backup). This way, you can accurately simulate a real deployment. 
+On macOS, run `$ brew install ansible`. 
+On Linux it's in your package manager (run `setup.sh` to have it automatically installed). 
+On Windows, get it by installing WSL, then running the Unix installation shell script (the `setup.sh` in this folder), or by running `setup.ps1`, which only works if you have `choco` installed. 
+If none of these work, you can try `pip install ansible` (works on any OS), but use a `venv` otherwise you might break your system Python.
 
-Once you have your installation done and remove the ISO from your virtual disk drive, make a copy of your installed VM. You can do this any way you want, but make sure to actually do this, because when a bad Ansible command trashes your VM you'll really wish you had it. Besides: you should test ideally on a vanilla installation anyways, restoring to vanilla and running Ansible to ensure it really works. You will need a fast internet connection for the Ansible tests to work (the tasks re-install the DNF package cache a few times, which can be slow). 
+Then, go get a copy of [AlmaLinux 10](https://almalinux.org)'s ISO image if the scripts haven't downloaded it for you (you'll know they did because they'll leave a `.iso` file in this folder. 
+
+Do a barebones vanilla install into the VM (only `Minimal Install` selected in the packages menu). More detailed installation instructions will be added soon.
+
+Once you have your installation done and remove the ISO from your virtual disk drive, make a copy of your installed VM. 
+
+Make sure that you make **multiple** VMs by cloning that first installation, one for each role (Prod, Dev, Backup). This way, you can accurately simulate a real deployment. 
 
 Jobs should never fail, but some jobs always result in a change or a skip. If a job fails, file a bug report.
 
@@ -26,9 +35,11 @@ When running for the first time, run the following command:
 ``` shell
 $ ansible-galaxy collection install community.general 
 ```
-This will install the required dependencies.
+This will install the required dependencies. The scripts `setup.ps1` and `setup.sh` do this for you, but only if they successfully installed Ansible for you. If they did not, or you installed Ansible without them, you need to run this manually. 
 
 Be sure that you have enabled password login in your VM's SSH config, and that the root account has a password. Change the Makefile to log in as another user if you'd prefer (they must be able to run `sudo` though). Another thing: make sure that when you cloned the VMs, you changed the MAC address on each one; if you did not, do this now. Also take this moment to quickly determine what the IP address is of each machine (you can find this by running `ip a` and noting down the address, called `inet`, for the interface it uses to connect to the internet, which is likely `enp0s1` if you're in a VM), and edit `inventory/hosts.ini` accordingly. Make sure each machine has the same root password, which can be changed with `passwd root`.
+
+You will need a fast internet connection for the Ansible tests to work (the tasks re-install the DNF package cache a few times, which can be slow), so make sure to set up your internet connection accordingly before starting.
 
 Then, run the command:
 ``` shell
@@ -48,13 +59,15 @@ Once Ansible finishes, reboot each machine. You've now got your new machines, se
 - If you have a slow internet connection, none of this will work well. You really want a fast one.
 - Some commands may be slow, especially so on the first run. There is no fix for this other than patience. They will eventually be completed; just give them some time.
 - None of this will work well if you don't read the server documentation. Be sure to go and read that, it's hosted on WSO itself on our private developer wiki.
+- On macOS, there is a rare bug where starting more than one VM at the same time can fail (this is due to a limitation in Apple's hardware accelerated virtual machines). To resolve this, simply start one virtual machine at a time, and wait for the boot of one to completely finish before launching the next one.
+- On Windows, you may encounter strange bugs if you run this outside of WSL. Please report them, but if you need to get things working in a hurry, it may be best to just use a WSL environment for this.  
 
 ## Directory Structure
 The directory is organized as follows:
 ``` shell
 roles/ # where we keep specific tasks (mostly by-package)
 inventory/
-	hosts.ini 
+	hosts.ini # defines machine logins and ip addresses
 group_vars/
 	wso_hosts.yml # variables for all hosts
 host_vars/ # variables per-host
