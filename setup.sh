@@ -33,16 +33,16 @@ install_ansible() {
 
 download_iso() {
     if [[ "$ARCH" == "x86_64" ]]; then
-	ISO_URL="https://repo.almalinux.org/almalinux/9.5/isos/x86_64/AlmaLinux-9.5-x86_64-boot.iso"
+	ISO_URL="https://repo.almalinux.org/almalinux/9/isos/x86_64/AlmaLinux-9-latest-x86_64-boot.iso"
     elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
-	ISO_URL="https://repo.almalinux.org/almalinux/9.5/isos/x86_64/AlmaLinux-9.5-aarch64-boot.iso"
+	ISO_URL="https://repo.almalinux.org/almalinux/9/isos/aarch64/AlmaLinux-9-latest-aarch64-boot.iso"
     else
 	echo "[setup.sh] Unsupported arch: $ARCH"; exit 1
     fi
     
-    read -rp "[setup.sh] ISO not found. Download AlmaLinux 9.5 for $ARCH? (y/N) " yn
+    read -rp "[setup.sh] ISO not found. Download AlmaLinux 9 latest for $ARCH? (y/N) " yn
     case "$yn" in
-        [Yy]*) curl -L -o "$PWD" "$ISO_URL" ;;
+        [Yy]*) curl -L -o "$PWD/AlmaLinux-9-latest-$ARCH-boot.iso" "$ISO_URL" ;;
         *) echo "[setup.sh] Need ISO but not allowed to download nor does the file exist. Aborting."; exit 1 ;;
     esac
 }
@@ -52,7 +52,7 @@ if ! command -v ansible &>/dev/null; then
     install_ansible
 fi
 
-if [[ ! -f "$PWD/AlmaLinux-9.5-$ARCH-boot.iso" ]]; then
+if [[ ! -f "$PWD/AlmaLinux-9-latest-$ARCH-boot.iso" ]]; then
     download_iso
 fi
 
