@@ -1,0 +1,84 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Add Mailman group
+  group:
+    name: mailman
+    gid: 1984
+    state: present
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Mailman user for security
+  user:
+     name: mailman
+     comment: Mailman Server User
+     uid: 1984 # because why not
+     shell: /bin/false
+     group: mailman
+     create_home: no
+     skeleton: "" # never logged into so no need for it
+     state: present
+  when: inventory_hostname == 'wso_prod'
+
+- name: Get Python dependency for Ansible Docker
+  dnf:
+    name: python3-requests
+    state: present
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Mailman root directory
+  file:
+     path: /opt/mailman
+     state: directory
+     owner: mailman
+     group: mailman
+     mode: '0750'
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Mailman service directory (1/2)
+  file:
+     path: /opt/mailman/core
+     state: directory
+     owner: mailman
+     group: mailman
+     mode: '0750'
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Mailman service directory (2/2)
+  file:
+     path: /opt/mailman/web
+     state: directory
+     owner: mailman
+     group: mailman
+     mode: '0750'
+  when: inventory_hostname == 'wso_prod'
+
+- name: Git checkout Docker Mailman
+  ansible.builtin.git:
+    repo: 'https://github.com/ansible/ansible.git'
+    dest: /opt/mailman/docker-mailman
+    update: no
+  when: inventory_hostname == 'wso_prod'
+
+- name: Fix perms for Docker Mailman
+  shell: chown -R mailman:mailman /opt/mailman
+  when: inventory_hostname == 'wso_prod'
+  
+- name: Install systemd service unit for Mailman Docker Compose
+  copy:
+    src: mailman.service
+    force: yes
+    dest: /usr/lib/systemd/system/mailman.service
+    mode: '0644'
+  when: inventory_hostname == 'wso_prod'
+
+- name: Reload systemd to register mailman service
+  command: systemctl daemon-reload
+  when: inventory_hostname == 'wso_prod'
+
+# - name: Enable and start Mailman service
+#   systemd:
+#     name: mailman
+#     enabled: yes
+#     state: started
+#   when: inventory_hostname == 'wso_prod'
+

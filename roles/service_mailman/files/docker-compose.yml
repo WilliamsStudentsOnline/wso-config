@@ -1,0 +1,38 @@
+services:
+ mailman-core:
+  image: maxking/mailman-core:0.4
+  container_name: mailman-core
+  restart: always
+  environment:
+  - DATABASE_URL=postgres://mailman:mailmanpass@mailman-db/mailmandb
+  - MAILMAN_REST_USER=restadmin
+  - MAILMAN_REST_PASSWORD=restpass
+  depends_on:
+  - mailman-db
+
+ mailman-web:
+  image: maxking/mailman-web:0.4
+  container_name: mailman-web
+  restart: always
+  ports:
+  - "8000:8000"
+  environment:
+  - DATABASE_URL=postgres://mailman:mailmanpass@mailman-db/mailmandb
+  - SECRET_KEY=changeme
+  - MAILMAN_REST_URL=http://mailman-core:8001
+  - MAILMAN_REST_USER=restadmin
+  - MAILMAN_REST_PASSWORD=restpass
+  depends_on:
+  - mailman-core
+
+ mailman-db:
+  image: postgres:13
+  container_name: mailman-db
+  restart: always
+  environment:
+  - POSTGRES_DB=mailmandb
+  - POSTGRES_USER=mailman
+  - POSTGRES_PASSWORD=mailmanpass
+  
+
+ 
