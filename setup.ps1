@@ -22,12 +22,12 @@ $isoPath = Join-Path $PWD $isoName
 
 function Install-Ansible {
     Write-Host "[setup.ps1] Trying to install Ansible..."
-    if (Get-Command winget -ErrorAction SilentlyContinue) {
-	Write-Host "[setup.ps1] WinGet is installed on your machine. You will need to install Ansible manually. As of June 2025, Microsoft has removed the package. Consider installing choco instead if you want this handled automatically."
-    } elseif (Get-Command choco -ErrorAction SilentlyContinue) {
+    if (Get-Command choco -ErrorAction SilentlyContinue) {
 	Write-Host "[setup.ps1] Please approve the installation on the next prompt."
         choco install ansible
 	ansible-galaxy collection install community.general
+    } elseif (Get-Command winget -ErrorAction SilentlyContinue) {
+	Write-Host "[setup.ps1] WinGet is installed on your machine. You will need to install Ansible manually. As of June 2025, Microsoft has removed the package. Consider installing choco instead if you want this handled automatically."
     } else {
         Write-Error "[setup.ps1] No package manager found. Install winget or choco, or install Ansible manually."
         exit 1
