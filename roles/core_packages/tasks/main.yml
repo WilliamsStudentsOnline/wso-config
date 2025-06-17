@@ -19,6 +19,7 @@
       - tree
       - setools
       - fuse
+      - unzip
       - fastfetch
 
 # define these in the host_vars section

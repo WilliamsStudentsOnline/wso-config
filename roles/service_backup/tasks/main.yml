@@ -6,6 +6,99 @@
     mode: '0755'
   when: inventory_hostname == 'wso_backup'
 
+- name: Check if Apaxy is installed
+  ansible.builtin.stat:
+    path: /backup/.htaccess
+  register: apaxy_flag
+
+# https://github.com/oupala/apaxy
+- name: Download Apaxy
+  get_url:
+    url: https://github.com/oupala/apaxy/archive/main.zip
+    dest: /backup
+    mode: 0644
+  when:
+  - inventory_hostname == 'wso_backup'
+  - not apaxy_flag.stat.exists
+
+- name: Unzip Apaxy
+  shell: cd /backup && unzip apaxy-main.zip && mv apaxy-main/apaxy/* . && rm -rf apaxy-main
+  when:
+  - inventory_hostname == 'wso_backup'
+  - not apaxy_flag.stat.exists
+
+- name: Replace {FOLDERNAME} with /backup in Apaxy configuration
+  ansible.builtin.replace:
+     path: "/backup/htaccess.txt"
+     regexp: '\{FOLDERNAME\}'
+     replace: '/backup'
+  when:
+  - inventory_hostname == 'wso_backup'
+  - not apaxy_flag.stat.exists
+  
+- name: Find html files in /backup/theme
+  ansible.builtin.find:
+    paths: /backup/theme
+    patterns: '*.html'
+  register: html_files
+  when:
+  - inventory_hostname == 'wso_backup'
+  - not apaxy_flag.stat.exists
+  
+- name: replace {FOLDERNAME} with /backup in each html file
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: '\{FOLDERNAME\}'
+    replace: '/backup'
+  loop: "{{ html_files.files }}"
+  when:
+  - inventory_hostname == 'wso_backup'
+  - not apaxy_flag.stat.exists
+  
+- name: Move Apache file to get Apaxy started
+  shell: mv /backup/htaccess.txt /backup/.htaccess
+  when:
+  - inventory_hostname == 'wso_backup'
+  - not apaxy_flag.stat.exists
+
+- name: Fix the Apaxy default theme
+  copy:
+    src: "{{ item }}"
+    dest: "/backup/theme/{{ item }}"
+    force: yes
+  loop:
+    - header.html
+    - footer.html
+  when: inventory_hostname == 'wso_backup'
+      
+- name: Fix SELinux perms on /backup
+  shell: |
+   semanage fcontext -a -t httpd_sys_rw_content_t "/backup(/.*)?"
+   restorecon -Rv /backup
+   chown apache:apache /backup
+   chmod -R o+rx /backup
+  when: inventory_hostname == 'wso_backup'
+
+- name: Deploy Apaxy vhost
+  copy:
+    dest: /etc/httpd/conf.d/apaxy.conf
+    force: yes
+    # accessible on localhost/backup
+    content: |
+          Alias /backup /backup
+          <Directory /backup>
+              Options +Indexes
+              AllowOverride All
+              Require all granted
+          </Directory>
+  when: inventory_hostname == 'wso_backup'
+
+- name: Restart Apache
+  systemd:
+    name: httpd
+    state: restarted
+  when: inventory_hostname == 'wso_backup'
+  
 - name: Create remote directory (remote server)
   ansible.builtin.file:
     path: /remote
