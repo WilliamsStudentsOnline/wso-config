@@ -1,0 +1,19 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install tuned
+  ansible.builtin.package:
+    name: tuned
+    state: present
+
+- name: Enable tuned
+  ansible.builtin.systemd:
+    name: tuned
+    enabled: yes
+    state: started
+    
+# TODO: test this against the other profile, latency-performance, and see
+# which might be better for our use-cases.
+- name: Set tuned profile
+  ansible.builtin.command:
+    cmd: tuned-adm profile throughput-performance
+    creates: /etc/tuned/active_profile

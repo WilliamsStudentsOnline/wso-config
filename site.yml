@@ -15,6 +15,7 @@
 
     # services
     - service_auditd
+    - service_tuned
     - service_zram
     - service_firewalld
     - service_fail2ban
