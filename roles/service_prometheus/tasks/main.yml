@@ -1,27 +1,109 @@
 ##### WSO-Config WSO 2.0 #####
 
-# TODO: massively broken on AlmaLinux 10
+# We only want ONE GUI (on prod),
+# but we can scrape all the other machines.
+# might want the stats
 
-# I don't know why they're named so weirdly
-- name: Install Prometheus
-  ansible.builtin.dnf:
-    name: golang-github-prometheus
-    state: present
+- name: Download Prometheus
+  get_url:
+  # TODO: change this on prod to the right arch
+    url: https://github.com/prometheus/prometheus/releases/download/v3.4.1/prometheus-3.4.1.linux-arm64.tar.gz
+    dest: /tmp/prometheus.tar.gz
+  when: inventory_hostname == 'wso_prod'
 
-- name: Enable and start Prometheus
+- name: Download Prometheus Node Exporter
+  get_url:
+  # TODO: change this on prod to the right arch
+    url: https://github.com/prometheus/node_exporter/releases/download/v1.9.1/node_exporter-1.9.1.linux-arm64.tar.gz
+    dest: /tmp/node.tar.gz
+
+- name: Extract Prometheus
+  unarchive:
+    src: /tmp/prometheus.tar.gz
+    dest: /tmp
+    remote_src: yes
+  when: inventory_hostname == 'wso_prod'
+
+- name: Extract Prometheus Node Exporter
+  unarchive:
+    src: /tmp/node.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: Move Prometheus binary
+  copy:
+    remote_src: yes
+    src: /tmp/prometheus-3.4.1.linux-arm64/prometheus
+    dest: /usr/local/bin/prometheus
+    mode: '0755'
+  when: inventory_hostname == 'wso_prod'
+
+- name: Move Prometheus Node Exporter binary
+  copy:
+    remote_src: yes
+    src: /tmp/node_exporter-1.9.1.linux-arm64/node_exporter
+    dest: /usr/local/bin/node_exporter
+    mode: '0755'
+
+- name: Install Prometheus service
+  copy:
+    src: prometheus.service
+    dest: /usr/lib/systemd/system/prometheus.service
+    mode: '0755'
+  when: inventory_hostname == 'wso_prod'
+
+- name: Install Prometheus config
+  copy:
+    src: prometheus.yml
+    dest: /etc/prometheus/prometheus.yml
+    mode: '0755'
+  when: inventory_hostname == 'wso_prod'
+
+- name: Install Prometheus Node Exporter service
+  copy:
+    src: node_exporter.service
+    dest: /usr/lib/systemd/system/node_exporter.service
+    mode: '0755'
+  
+- name: Create Prometheus user
+  user:
+    name: prometheus
+    system: yes
+    shell: /sbin/nologin
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Prometheus Node Exporter user
+  user:
+    name: node_exporter
+    system: yes
+    shell: /sbin/nologin
+
+- name: Make Prometheus data directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+  loop:
+   - /etc/prometheus
+   - /var/lib/prometheus
+  when: inventory_hostname == 'wso_prod'
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: Enable & start Prometheus
   systemd:
     name: prometheus
     enabled: yes
     state: started
+  when: inventory_hostname == 'wso_prod'
 
-- name: Install Prometheus Node Exporter
-  ansible.builtin.dnf:
-    name: golang-github-prometheus-node-exporter
-    state: present
-
-- name: Enable and start Prometheus Node Exporter
+- name: Enable & start Prometheus
   systemd:
-    name: prometheus-node-exporter
+    name: node_exporter
     enabled: yes
     state: started
 

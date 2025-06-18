@@ -67,6 +67,14 @@
     permanent: yes
     state: enabled
 
+# for testing, disable in prod
+- name: Allow Prometheus Node Exporter from LAN
+  ansible.posix.firewalld:
+    rich_rule: 'rule family="ipv4" source address="192.168.1.0/24" port protocol="tcp" port="9100" accept'
+    zone: public
+    permanent: yes
+    state: enabled
+
 - name: Allow Webmin from LAN
   ansible.posix.firewalld:
     rich_rule: 'rule family="ipv4" source address="192.168.1.0/24" port protocol="tcp" port="10000" accept'

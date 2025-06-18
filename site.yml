@@ -23,7 +23,7 @@
     - service_apache
     - service_webmin
     - service_grafana
-    # - service_prometheus # TODO: broken on almalinux 10
+    - service_prometheus
     - service_docker
     - service_mailman
     - service_mysql
