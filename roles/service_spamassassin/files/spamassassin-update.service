@@ -1,0 +1,17 @@
+[Unit]
+Description=Spamassassin Auto-Updater
+After=network.target
+
+[Service]
+User=spamd
+Group=spamd
+Type=oneshot
+
+ExecStart=/usr/bin/vendor_perl/sa-update
+SuccessExitStatus=1
+ExecStart=/usr/bin/vendor_perl/sa-compile
+ExecStart=!/usr/bin/systemctl -q --no-block try-restart spamassassin.service
+
+# TODO: uncomment the following ExecStart line to train SA's bayes filter
+# and specify the path to the mailbox that contains spam email(s)
+#ExecStart=/usr/bin/vendor_perl/sa-learn --spam <path_to_your_spam_mailbox>
