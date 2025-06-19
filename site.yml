@@ -27,6 +27,9 @@
     - service_prometheus
     - service_docker
     - service_mailman
+    - service_spamassassin
+    - service_postfix
+    - service_dovecot
     - service_mysql
     - service_oomd
     - service_jenkins
