@@ -27,13 +27,14 @@
 
 - name: Download Paper JAR
   get_url:
-  # TODO: update this when Paper drops 1.21.5, then we're never updating again (too much work)
+  # TODO: paper has updated, but we're waiting for just ChunkyBorder to update...
     url: https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/232/downloads/paper-1.21.4-232.jar
     dest: /opt/minecraft/paper.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
 # TODO: check all of these plugins before any update!
+# we are running 1.21.4. at some point, we should update to 1.21.7, and then fix the version there.
 
 - name: Download Spark plugin
   get_url:
@@ -49,7 +50,7 @@
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
-- name: Download Chunky worldborder plugin
+- name: Download ChunkyBorder plugin
   get_url:
     url: https://cdn.modrinth.com/data/s86X568j/versions/asaBBItO/ChunkyBorder-Bukkit-1.2.23.jar
     dest: /opt/minecraft/plugins/chunky-border.jar
@@ -63,10 +64,38 @@
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
+- name: Download Dynmap plugin
+  get_url:
+    url: https://cdn.modrinth.com/data/fRQREgAc/versions/ImNNT17B/Dynmap-3.7-beta-8-spigot.jar
+    dest: /opt/minecraft/plugins/dynmap.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
+- name: Download SeeMore plugin
+  get_url:
+    url: https://cdn.modrinth.com/data/IEt1Yy3F/versions/QXCh3qCi/SeeMore-1.0.2.jar
+    dest: /opt/minecraft/plugins/seemore.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
 - name: Download MiniMOTD plugin
   get_url:
     url: https://cdn.modrinth.com/data/16vhQOQN/versions/SgOOeke0/minimotd-bukkit-2.1.5.jar
     dest: /opt/minecraft/plugins/mini-motd.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
+- name: Download EssentialsX plugin
+  get_url:
+    url: https://cdn.modrinth.com/data/hXiIvTyT/versions/SKQwLLoQ/EssentialsX-2.21.0.jar
+    dest: /opt/minecraft/plugins/essentialsx.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
+- name: Download LuckPerms plugin
+  get_url:
+    url: https://download.luckperms.net/1594/bukkit/loader/LuckPerms-Bukkit-5.5.9.jar
+    dest: /opt/minecraft/plugins/essentialsx.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
   
@@ -78,26 +107,17 @@
     recurse: yes
   when: inventory_hostname == 'wso_prod'
 
-- name: Copy MiniMOTD main config file
+- name: Copy MiniMOTD config files
   copy:
-    src: minimotd_main.conf
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: mc
     force: yes
-    dest: /opt/minecraft/plugins/MiniMOTD/main.conf
   when: inventory_hostname == 'wso_prod'
-
-- name: Copy MiniMOTD secondary config file
-  copy:
-    src: minimotd_plugin_settings.conf
-    force: yes
-    dest: /opt/minecraft/plugins/MiniMOTD/plugin_settings.conf
-  when: inventory_hostname == 'wso_prod'
-
-- name: Copy MiniMOTD icon
-  copy:
-    src: ephelia_face_smol.png
-    force: yes
-    dest: /opt/minecraft/plugins/MiniMOTD/icons/
-  when: inventory_hostname == 'wso_prod'
+  loop:
+    - { src: "minimotd_main.conf", dest: "/opt/minecraft/plugins/MiniMOTD/main.conf" }
+    - { src: "minimotd_plugin_settings.conf", dest: "/opt/minecraft/plugins/MiniMOTD/plugin_settings.conf" }
+    - { src: "ephelia_face_smol.png", dest: "/opt/minecraft/plugins/MiniMOTD/icons/" }
 
 - name: Download CoreProtect plugin
   get_url:
@@ -105,6 +125,41 @@
     dest: /opt/minecraft/plugins/core-protect.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
+
+- name: Create ChunkyBorder directories
+  file:
+    path: /opt/minecraft/plugins/ChunkyBorder
+    state: directory
+    owner: mc
+    recurse: yes
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Dynmap directories
+  file:
+    path: /opt/minecraft/plugins/dynmap
+    state: directory
+    owner: mc
+    recurse: yes
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Dynmap config file
+  copy:
+    src: dynmap-config.txt
+    dest: /opt/minecraft/plugins/dynmap/configuration.txt
+    force: yes
+    owner: mc
+  when: inventory_hostname == 'wso_prod'
+
+- name: Copy ChunkyBorder config files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: mc
+    force: yes
+  when: inventory_hostname == 'wso_prod'
+  loop:
+    - { src: "borders.json", dest: "/opt/minecraft/plugins/ChunkyBorders/" }
+    - { src: "chunkyborders-config.yml", dest: "/opt/minecraft/plugins/ChunkyBorders/config.yml" }
 
 # Unfortunately, you'll need to add your own datapacks.
 
@@ -120,6 +175,13 @@
   copy:
     src: start.sh
     dest: /opt/minecraft/start.sh
+    mode: 0755
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Minecraft manual launch script
+  copy:
+    src: start.sh
+    dest: /opt/minecraft/start-manually.sh
     mode: 0755
   when: inventory_hostname == 'wso_prod'
 
@@ -139,6 +201,9 @@
   when: inventory_hostname == 'wso_prod'
 
 # TODO: switch this on for prod, but on test VMs it's too intensive
+
+# You'll also need to install the rcon client. Download and compile from here:
+# https://github.com/Tiiffi/mcrcon
 
 # - name: Enable and start Minecraft
 #   systemd:

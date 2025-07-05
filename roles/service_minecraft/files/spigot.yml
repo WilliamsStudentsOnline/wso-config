@@ -174,7 +174,7 @@ commands:
   - testforblock
   - tellraw
   log: true
-  tab-complete: 0
+  tab-complete: -1 # only approved users can make commands, LuckPerms is for this
   send-namespaced: true
   enable-spam-exclusions: false
 stats:

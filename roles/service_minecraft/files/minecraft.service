@@ -8,10 +8,12 @@ User=mc
 Restart=on-failure
 ExecStart=/opt/minecraft/start.sh
 Nice=10
+# TODO: need to change these settings on prod, they're arguably too minimal
 IOSchedulingClass=2
 IOSchedulingPriority=7
-CPUQuota=50%
-MemoryMax=4096M
+# CPUQuota refers to the percent of a core taken up by a service. so this will consume 1 full core, but the other cores should be fine on the machine
+CPUQuota=100% 
+MemoryMax=6144M
 
 [Install]
 WantedBy=multi-user.target

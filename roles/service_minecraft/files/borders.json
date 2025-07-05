@@ -1,0 +1,29 @@
+{
+  "world": {
+    "world": "world",
+    "centerX": 0.5,
+    "centerZ": 0.5,
+    "radiusX": 8000.0,
+    "radiusZ": 8000.0,
+    "shape": "square",
+    "wrap": "none"
+  },
+  "world_nether": {
+    "world": "world_nether",
+    "centerX": 0.5,
+    "centerZ": 0.5,
+    "radiusX": 1000.0,
+    "radiusZ": 1000.0,
+    "shape": "square",
+    "wrap": "none"
+  },
+  "world_the_end": {
+    "world": "world_the_end",
+    "centerX": 0.5,
+    "centerZ": 0.5,
+    "radiusX": 8000.0,
+    "radiusZ": 8000.0,
+    "shape": "square",
+    "wrap": "none"
+  }
+}
