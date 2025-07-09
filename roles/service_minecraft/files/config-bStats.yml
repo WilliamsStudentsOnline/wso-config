@@ -1,0 +1,6 @@
+# this plugin is spyware. I don't care what the benefits are.
+# we're turning it off. plugin authors be damned.
+
+enabled: false
+#serverUuid: 34103404-3ae0-468f-8736-302d8670d76c
+#logFailedRequests: false

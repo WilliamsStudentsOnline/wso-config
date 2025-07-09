@@ -161,6 +161,22 @@
     - { src: "borders.json", dest: "/opt/minecraft/plugins/ChunkyBorders/" }
     - { src: "chunkyborders-config.yml", dest: "/opt/minecraft/plugins/ChunkyBorders/config.yml" }
 
+- name: Create bStats directories
+  file:
+    path: /opt/minecraft/plugins/bStats
+    state: directory
+    owner: mc
+    recurse: yes
+  when: inventory_hostname == 'wso_prod'
+
+# it's lowkey evil that we must do this, but I don't want data leaks
+- name: Disable Minecraft telemetry (bStats)
+  copy:
+    src: config-bStats.yml
+    dest: /opt/minecraft/plugins/bStats/config.yml
+    mode: 0755
+  when: inventory_hostname == 'wso_prod'
+
 # Unfortunately, you'll need to add your own datapacks.
 
 - name: Accept Minecraft EULA
