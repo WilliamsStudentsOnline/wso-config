@@ -201,6 +201,33 @@
     mode: 0755
   when: inventory_hostname == 'wso_prod'
 
+# this adds in the mcrcon tool, which is useful,
+# as it lets you basically issue server commands.
+- name: Clone mcrcon utility
+  ansible.builtin.git:
+    repo: 'https://github.com/Tiiffi/mcrcon'
+    dest: /opt/mcrcon
+  when: inventory_hostname == 'wso_prod'
+
+# TODO: when you deploy this, remember to change server.preferences
+# to bind correctly so mcrcon can read it!
+- name: Chown mcrcon to mc user
+  ansible.builtin.command: chown -R mc:mc /opt/mcrcon
+  when: inventory_hostname == 'wso_prod'
+
+# TODO: make more of these that handle the render commands
+- name: "Create mcrcon cronjob: broadcast server render warning"
+  ansible.builtin.cron:
+    name: "MC Server Render Warning"
+    hour: "3"
+    minute: "0"
+    disabled: true
+    job: >
+      mcrcon -H localhost -p $PASSWORD
+      'tellraw @p {
+        "text": "Server will start rendering soon!\nThis will significantly degrade performance. Consider logging off and going to bed."
+      }'    
+
 - name: Create Minecraft server properties
   copy:
     src: server.properties
@@ -217,9 +244,6 @@
   when: inventory_hostname == 'wso_prod'
 
 # TODO: switch this on for prod, but on test VMs it's too intensive
-
-# You'll also need to install the rcon client. Download and compile from here:
-# https://github.com/Tiiffi/mcrcon
 
 # - name: Enable and start Minecraft
 #   systemd:
