@@ -34,4 +34,3 @@
   ansible.builtin.file:
     path: /root/ansible
     state: directory
-      

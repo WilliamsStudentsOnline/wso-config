@@ -1,13 +1,13 @@
 ##### WSO-Config WSO 2.0 #####
 
 - name: Install dependencies
-  dnf:
+  ansible.builtin.dnf:
     name: java-21-openjdk-headless
     state: present
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Minecraft user for security
-  user:
+  ansible.builtin.user:
      name: mc
      comment: Minecraft Server User
      uid: 2011 # year minecraft 1.0.0 released
@@ -18,7 +18,7 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Minecraft directories
-  file:
+  ansible.builtin.file:
     path: /opt/minecraft/plugins
     state: directory
     owner: mc
@@ -26,7 +26,7 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Download Paper JAR
-  get_url:
+  ansible.builtin.get_url:
   # TODO: paper has updated, but we're waiting for just ChunkyBorder to update...
     url: https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/232/downloads/paper-1.21.4-232.jar
     dest: /opt/minecraft/paper.jar
@@ -37,70 +37,70 @@
 # we are running 1.21.4. at some point, we should update to 1.21.7, and then fix the version there.
 
 - name: Download Spark plugin
-  get_url:
+  ansible.builtin.get_url:
     url: https://ci.lucko.me/job/spark/487/artifact/spark-bukkit/build/libs/spark-1.10.138-bukkit.jar
     dest: /opt/minecraft/plugins/spark.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
 - name: Download Chunky plugin
-  get_url:
+  ansible.builtin.get_url:
     url: https://cdn.modrinth.com/data/fALzjamp/versions/SmZRkQyR/Chunky-Bukkit-1.4.36.jar
     dest: /opt/minecraft/plugins/chunky.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
 - name: Download ChunkyBorder plugin
-  get_url:
+  ansible.builtin.get_url:
     url: https://cdn.modrinth.com/data/s86X568j/versions/asaBBItO/ChunkyBorder-Bukkit-1.2.23.jar
     dest: /opt/minecraft/plugins/chunky-border.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
 - name: Download ViaVersion plugin
-  get_url:
+  ansible.builtin.get_url:
     url: https://cdn.modrinth.com/data/P1OZGk5p/versions/cdC9vQSF/ViaVersion-5.3.2.jar
     dest: /opt/minecraft/plugins/viaversion.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
 - name: Download Dynmap plugin
-  get_url:
+  ansible.builtin.get_url:
     url: https://cdn.modrinth.com/data/fRQREgAc/versions/ImNNT17B/Dynmap-3.7-beta-8-spigot.jar
     dest: /opt/minecraft/plugins/dynmap.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
 - name: Download SeeMore plugin
-  get_url:
+  ansible.builtin.get_url:
     url: https://cdn.modrinth.com/data/IEt1Yy3F/versions/QXCh3qCi/SeeMore-1.0.2.jar
     dest: /opt/minecraft/plugins/seemore.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
 - name: Download MiniMOTD plugin
-  get_url:
+  ansible.builtin.get_url:
     url: https://cdn.modrinth.com/data/16vhQOQN/versions/SgOOeke0/minimotd-bukkit-2.1.5.jar
     dest: /opt/minecraft/plugins/mini-motd.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
 - name: Download EssentialsX plugin
-  get_url:
+  ansible.builtin.get_url:
     url: https://cdn.modrinth.com/data/hXiIvTyT/versions/SKQwLLoQ/EssentialsX-2.21.0.jar
     dest: /opt/minecraft/plugins/essentialsx.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
 - name: Download LuckPerms plugin
-  get_url:
+  ansible.builtin.get_url:
     url: https://download.luckperms.net/1594/bukkit/loader/LuckPerms-Bukkit-5.5.9.jar
     dest: /opt/minecraft/plugins/essentialsx.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
   
 - name: Create MiniMOTD directories
-  file:
+  ansible.builtin.file:
     path: /opt/minecraft/plugins/MiniMOTD/icons
     state: directory
     owner: mc
@@ -120,14 +120,14 @@
     - { src: "ephelia_face_smol.png", dest: "/opt/minecraft/plugins/MiniMOTD/icons/" }
 
 - name: Download CoreProtect plugin
-  get_url:
+  ansible.builtin.get_url:
     url: https://cdn.modrinth.com/data/Lu3KuzdV/versions/llmrc4cl/CoreProtect-22.4.jar
     dest: /opt/minecraft/plugins/core-protect.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
 - name: Create ChunkyBorder directories
-  file:
+  ansible.builtin.file:
     path: /opt/minecraft/plugins/ChunkyBorder
     state: directory
     owner: mc
@@ -135,7 +135,7 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Dynmap directories
-  file:
+  ansible.builtin.file:
     path: /opt/minecraft/plugins/dynmap
     state: directory
     owner: mc
@@ -162,7 +162,7 @@
     - { src: "chunkyborders-config.yml", dest: "/opt/minecraft/plugins/ChunkyBorders/config.yml" }
 
 - name: Create bStats directories
-  file:
+  ansible.builtin.file:
     path: /opt/minecraft/plugins/bStats
     state: directory
     owner: mc

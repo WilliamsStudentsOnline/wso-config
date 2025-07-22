@@ -1,13 +1,13 @@
 ##### WSO-Config WSO 2.0 #####
 
 - name: Check if Webmin repo is already present
-  stat:
+  ansible.builtin.stat:
     path: /etc/yum.repos.d/webmin-stable.repo
   register: webmin_repo
 
 - name: Install Webmin the canonical way
   # without forcing, webmin won't install. don't remove that -f!
-  shell: |
+  ansible.builtin.shell: |
     curl -o /root/ansible/webmin-setup-repo.sh https://raw.githubusercontent.com/webmin/webmin/master/webmin-setup-repo.sh
     sh /root/ansible/webmin-setup-repo.sh -f
   when:
@@ -15,7 +15,7 @@
     - not webmin_repo.stat.exists
 
 - name: Install Webmin using new repos
-  dnf:
+  ansible.builtin.dnf:
     name: webmin
     state: present
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
@@ -30,7 +30,7 @@
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Enable and start webmin
-  systemd:
+  ansible.builtin.systemd:
     name: webmin
     enabled: yes
     state: started

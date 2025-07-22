@@ -13,7 +13,7 @@
 
 # https://github.com/oupala/apaxy
 - name: Download Apaxy
-  get_url:
+  ansible.builtin.get_url:
     url: https://github.com/oupala/apaxy/archive/main.zip
     dest: /backup
     mode: 0644
@@ -22,7 +22,7 @@
   - not apaxy_flag.stat.exists
 
 - name: Unzip Apaxy
-  shell: cd /backup && unzip apaxy-main.zip && mv apaxy-main/apaxy/* . && rm -rf apaxy-main
+  ansible.builtin.shell: cd /backup && unzip apaxy-main.zip && mv apaxy-main/apaxy/* . && rm -rf apaxy-main
   when:
   - inventory_hostname == 'wso_backup'
   - not apaxy_flag.stat.exists
@@ -56,13 +56,13 @@
   - not apaxy_flag.stat.exists
   
 - name: Move Apache file to get Apaxy started
-  shell: mv /backup/htaccess.txt /backup/.htaccess
+  ansible.builtin.shell: mv /backup/htaccess.txt /backup/.htaccess
   when:
   - inventory_hostname == 'wso_backup'
   - not apaxy_flag.stat.exists
 
 - name: Fix the Apaxy default theme
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: "/backup/theme/{{ item }}"
     force: yes
@@ -72,7 +72,7 @@
   when: inventory_hostname == 'wso_backup'
       
 - name: Fix SELinux perms on /backup
-  shell: |
+  ansible.builtin.shell: |
    semanage fcontext -a -t httpd_sys_rw_content_t "/backup(/.*)?"
    restorecon -Rv /backup
    chown apache:apache /backup
@@ -80,7 +80,7 @@
   when: inventory_hostname == 'wso_backup'
 
 - name: Deploy Apaxy vhost
-  copy:
+  ansible.builtin.copy:
     dest: /etc/httpd/conf.d/apaxy.conf
     force: yes
     # accessible on localhost/backup
@@ -94,7 +94,7 @@
   when: inventory_hostname == 'wso_backup'
 
 - name: Restart Apache
-  systemd:
+  ansible.builtin.systemd:
     name: httpd
     state: restarted
   when: inventory_hostname == 'wso_backup'
@@ -114,45 +114,45 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Generate Borg ssh keypair for root
-  command: ssh-keygen -t ed25519 -f /root/.ssh/borg_key -N ''
+  ansible.builtin.command: ssh-keygen -t ed25519 -f /root/.ssh/borg_key -N ''
   args:
     creates: /root/.ssh/borg_key
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Fetch Borg public key
-  slurp:
+  ansible.builtin.slurp:
     src: /root/.ssh/borg_key.pub
   register: borg_pubkey_raw
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Set Borg pubkey string
-  set_fact:
+  ansible.builtin.set_fact:
     borg_pubkey: "{{ borg_pubkey_raw.content | b64decode }}"
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Ensure /root/.ssh exists
-  file:
+  ansible.builtin.file:
     path: /root/.ssh
     state: directory
     mode: '0700'
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Authorize peer Borg key on backup
-  authorized_key:
+  ansible.builtin.authorized_key:
     user: root
     key: "{{ hostvars['wso_prod'].borg_pubkey }}"
     comment: "Borg key"
   when: inventory_hostname == 'wso_backup'
 
 - name: Authorize peer Borg key on prod
-  authorized_key:
+  ansible.builtin.authorized_key:
     user: root
     key: "{{ hostvars['wso_backup'].borg_pubkey }}"
     comment: "Borg key"
   when: inventory_hostname == 'wso_prod'
 
 - name: Ensure SSH config exists
-  file:
+  ansible.builtin.file:
     path: /root/.ssh/config
     state: touch
     mode: '0600'
@@ -161,7 +161,7 @@
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Add SSH identity config for peer
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /root/.ssh/config
     create: yes
     owner: root
@@ -180,7 +180,7 @@
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: enable user_allow_other in fuse.conf
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/fuse.conf
     regexp: '^#?user_allow_other'
     line: 'user_allow_other'

@@ -9,7 +9,7 @@
   when: inventory_hostname == 'wso_backup'
 
 - name: Ensure proper subdirs exist
-  file:
+  ansible.builtin.file:
     path: /srv/www/
     state: directory
     owner: apache
@@ -25,7 +25,7 @@
   when: inventory_hostname == 'wso_backup'
 
 - name: Set permissions with shell (recursive chown)
-  shell: chown -R apache:apache /srv/www/cachet
+  ansible.builtin.shell: chown -R apache:apache /srv/www/cachet
   when: inventory_hostname == 'wso_backup'
 
 - name: Set SELinux context on /srv and subdirs for Apache
@@ -58,7 +58,7 @@
 
 # I don't know WHY it's broken but this fixes it
 - name: Fix SELinux perms in Cachet
-  shell: |
+  ansible.builtin.shell: |
    semanage fcontext -a -t httpd_sys_rw_content_t "/srv/www/cachet/storage(/.*)?"
    semanage fcontext -a -t httpd_sys_rw_content_t "/srv/www/cachet/bootstrap/cache(/.*)?"
    semanage fcontext -a -t httpd_sys_rw_content_t "/srv/www/cachet/database(/.*)?"
@@ -69,7 +69,7 @@
   when: inventory_hostname == 'wso_backup' 
 
 - name: Copy Cachet config file
-  copy:
+  ansible.builtin.copy:
     src: env-file
     force: yes
     dest: /srv/www/cachet/.env
@@ -80,7 +80,7 @@
 
 # TODO: change this in production
 - name: Deploy Cachet vhost
-  copy:
+  ansible.builtin.copy:
     dest: /etc/httpd/conf.d/cachet.conf
     force: yes
     content: |
@@ -100,7 +100,7 @@
   when: inventory_hostname == 'wso_backup'
 
 - name: Restart Apache
-  systemd:
+  ansible.builtin.systemd:
     name: httpd
     state: restarted
   when: inventory_hostname == 'wso_backup'

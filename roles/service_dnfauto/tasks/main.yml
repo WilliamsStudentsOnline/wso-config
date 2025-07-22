@@ -1,18 +1,18 @@
 ##### WSO-Config WSO 2.0 #####
 
 - name: Install dnf-automatic
-  dnf:
+  ansible.builtin.dnf:
     name: dnf-automatic
     state: present
 
 - name: Create override dir for dnf-automatic.timer
-  file:
+  ansible.builtin.file:
     path: /etc/systemd/system/dnf-automatic.timer.d
     state: directory
     mode: '0755'
 
 - name: Override dnf-automatic timer to run every Saturday
-  copy:
+  ansible.builtin.copy:
     dest: /etc/systemd/system/dnf-automatic.timer.d/override.conf
     content: |
       [Timer]
@@ -20,10 +20,10 @@
       OnCalendar=Sat *-*-* 06:00:00
 
 - name: Reload systemd timers
-  shell: systemctl daemon-reexec
+  ansible.builtin.shell: systemctl daemon-reexec
 
 - name: Ensure dnf-automatic timer is enabled and started
-  systemd:
+  ansible.builtin.systemd:
     name: dnf-automatic.timer
     enabled: true
     state: started

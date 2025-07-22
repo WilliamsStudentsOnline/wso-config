@@ -2,7 +2,7 @@
 
 # TODO: per host
 - name: Manually set /etc/hostname
-  copy:
+  ansible.builtin.copy:
     dest: /etc/hostname
     content: "{{ host_name }}\n"
     owner: root
@@ -11,7 +11,7 @@
   when: host_name is defined
 
 - name: Set hostname immediately
-  command: hostnamectl set-hostname "{{ host_name }}"
+  ansible.builtin.command: hostnamectl set-hostname "{{ host_name }}"
   when: host_name is defined  
 
 - name: Setup MOTD files
@@ -20,6 +20,3 @@
     dest: /etc/motd
     backup: yes
   when: system_motd is defined
-  
-    
-    

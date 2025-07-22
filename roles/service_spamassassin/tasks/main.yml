@@ -7,7 +7,7 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Install systemd service unit for spamassassin-update
-  copy:
+  ansible.builtin.copy:
     src: spamassassin-update.service
     force: yes
     dest: /usr/lib/systemd/system/spamassassin-update.service
@@ -15,7 +15,7 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Install systemd timer unit for spamassassin-update
-  copy:
+  ansible.builtin.copy:
     src: spamassassin-update.timer
     force: yes
     dest: /usr/lib/systemd/system/spamassassin-update.timer

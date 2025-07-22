@@ -36,7 +36,7 @@ Jobs should never fail, but some jobs always result in a change or a skip. If a 
 - Also open a pull request on the [wiki](https://github.com/WilliamsStudentsOnline/wiki). Remember, it's important that future WSO members understand how our infrastructure works, so failing to do this is important.
 - Write, and try to replace, all unidiomatic Ansible with better versions:
   - Don't write the same command over and over again, use `loop:` or other commands.
-  - Don't write bare module names, use `ansible.builtins.` for everything
+  - Don't write bare module names, use `ansible.builtin.` for everything
   - Don't remake the wheel, consider using `ansible-galaxy` modules (but document them!)
   - If you're adding a service, ensure your services follow the [principle of least privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege) and the [principle of least astonishment](https://en.wikipedia.org/wiki/Principle_of_least_astonishment). Services shouldn't use complex options, or use insane configurations, or completely disregard default settings. They should be normal `systemd` service files or `cron` jobs that can be easily restarted and stopped by normal users. 
 - Comment weird tricks in your code! Just because your code makes sense now doesn't mean it will make any sense to someone in five years from now.

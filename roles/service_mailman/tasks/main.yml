@@ -1,14 +1,14 @@
 ##### WSO-Config WSO 2.0 #####
 
 - name: Add Mailman group
-  group:
+  ansible.builtin.group:
     name: mailman
     gid: 1984
     state: present
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Mailman user for security
-  user:
+  ansible.builtin.user:
      name: mailman
      comment: Mailman Server User
      uid: 1984 # because why not
@@ -20,13 +20,13 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Get Python dependency for Ansible Docker
-  dnf:
+  ansible.builtin.dnf:
     name: python3-requests
     state: present
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Mailman root directory
-  file:
+  ansible.builtin.file:
      path: /opt/mailman
      state: directory
      owner: mailman
@@ -35,7 +35,7 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Mailman service directory (1/2)
-  file:
+  ansible.builtin.file:
      path: /opt/mailman/core
      state: directory
      owner: mailman
@@ -44,7 +44,7 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Mailman service directory (2/2)
-  file:
+  ansible.builtin.file:
      path: /opt/mailman/web
      state: directory
      owner: mailman
@@ -60,11 +60,11 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Fix perms for Docker Mailman
-  shell: chown -R mailman:mailman /opt/mailman
+  ansible.builtin.shell: chown -R mailman:mailman /opt/mailman
   when: inventory_hostname == 'wso_prod'
   
 - name: Install systemd service unit for Mailman Docker Compose
-  copy:
+  ansible.builtin.copy:
     src: mailman.service
     force: yes
     dest: /usr/lib/systemd/system/mailman.service
@@ -72,7 +72,7 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Reload systemd to register mailman service
-  command: systemctl daemon-reload
+  ansible.builtin.command: systemctl daemon-reload
   when: inventory_hostname == 'wso_prod'
 
 # - name: Enable and start Mailman service

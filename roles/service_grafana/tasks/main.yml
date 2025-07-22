@@ -65,15 +65,15 @@
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Unbreak Grafana permissions
-  shell: chmod -R u+rwX /var/lib/grafana
+  ansible.builtin.shell: chmod -R u+rwX /var/lib/grafana
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Unbreak Grafana SELinux permissions
-  shell: restorecon -Rv /var/lib/grafana
+  ansible.builtin.shell: restorecon -Rv /var/lib/grafana
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Enable and start Grafana
-  systemd:
+  ansible.builtin.systemd:
     name: grafana
     enabled: yes
     state: started

@@ -1,15 +1,15 @@
 ##### WSO-Config WSO 2.0 #####
 
 - name: Install zram-generator
-  dnf:
+  ansible.builtin.dnf:
     name: zram-generator
     state: present
 
 - name: Load zram kernel module
-  shell: modprobe zram
+  ansible.builtin.shell: modprobe zram
 
 - name: Ensure zram stays on
-  copy:
+  ansible.builtin.copy:
     dest: /etc/modules-load.d/zram.conf
     content: "zram"
         
@@ -20,7 +20,7 @@
     backup: yes
 
 - name: Enable and start zram-generator
-  systemd:
+  ansible.builtin.systemd:
     name: systemd-zram-setup@zram0
     enabled: yes
     state: started

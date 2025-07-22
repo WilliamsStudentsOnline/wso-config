@@ -4,12 +4,12 @@
 # because it's a very useful feature to have.
 
 - name: Install oomd
-  dnf:
+  ansible.builtin.dnf:
     name: systemd-oomd
     state: present
 
 - name: Enable and start oomd
-  systemd:
+  ansible.builtin.systemd:
     name: systemd-oomd
     enabled: yes
     state: started

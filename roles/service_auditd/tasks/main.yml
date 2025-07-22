@@ -1,12 +1,13 @@
 ##### WSO-Config WSO 2.0 #####
+# TODO: should enhance with better logging of the interesting stuff
 
 - name: Install auditd
-  dnf:
+  ansible.builtin.dnf:
     name: audit
     state: present
 
 - name: Enable and start auditd
-  systemd:
+  ansible.builtin.systemd:
     name: auditd
     enabled: yes
     state: started

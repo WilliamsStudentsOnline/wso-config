@@ -2,21 +2,21 @@
 
 # force this on
 - name: Enable SELinux enforcing
-  selinux:
+  ansible.builtin.selinux:
     policy: targeted
     state: enforcing
 
 # too many of these. go check the values in ../../vars/main.yml
 - name: Harden sysctl
-  sysctl:
+  ansible.builtin.sysctl:
     name: "{{ item.key }}"
     value: "{{ item.value }}"
     state: present
     reload: yes
-  loop: "{{ sysctl_hardening }}"
+  loop: "{{ hardening_sysctls }}"
 
 - name: Harden weak permissions
-  shell: chmod 700 /boot /usr/src /lib/modules /usr/lib/modules
+  ansible.builtin.shell: chmod 700 /boot /usr/src /lib/modules /usr/lib/modules
 
 - name: Harden loadable kernel modules
   ansible.builtin.copy:
@@ -26,7 +26,7 @@
     mode: 0700
 
 - name: Disable insecure service kdump
-  systemd:
+  ansible.builtin.systemd:
     name: kdump
     enabled: no
     state: stopped

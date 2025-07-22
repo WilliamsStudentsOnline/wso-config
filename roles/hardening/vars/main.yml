@@ -1,7 +1,7 @@
 ##### WSO-Config WSO 2.0 #####
 
 # might want to make this more or less permissive, depending on host.
-sysctl_hardening:
+hardening_sysctls:
   - { key: kernel.printk, value: "3 3 3 3" } # makes it so much less noisy w/ firewall
   - { key: kernel.kptr_restrict, value: 2 } # no more kernel pointers
   - { key: kernel.randomize_va_space, value: 2 } # randomize memory

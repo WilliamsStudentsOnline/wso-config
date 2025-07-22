@@ -34,7 +34,7 @@
     state: present
 
 - name: Enable and start Jenkins
-  systemd:
+  ansible.builtin.systemd:
     name: jenkins
     enabled: yes
     state: started

@@ -3,7 +3,7 @@
 # We always reference things by name if possible; this is where we define
 
 - name: Ensure /etc/hosts has peer hosts
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/hosts
     line: "{{ hostvars[item].ansible_host | default(item) }} {{ hostvars[item].host_name }}"
     create: yes

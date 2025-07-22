@@ -1,7 +1,7 @@
 ##### WSO-Config WSO 2.0 #####
 
 - name: Install dependencies
-  package:
+  ansible.builtin.package:
     name:
     - yum-utils
     - device-mapper-persistent-data
@@ -9,7 +9,7 @@
     state: present
 
 - name: Add Docker repo
-  get_url:
+  ansible.builtin.get_url:
     url: https://download.docker.com/linux/centos/docker-ce.repo
     dest: /etc/yum.repos.d/docker-ce.repo
 
@@ -19,7 +19,7 @@
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Install Docker and Docker Compose plugin
-  dnf:
+  ansible.builtin.dnf:
     name:
     - docker-ce
     - docker-ce-cli
@@ -28,7 +28,7 @@
     state: present
 
 - name: Enable and start Docker
-  systemd:
+  ansible.builtin.systemd:
     name: docker
     state: started
     enabled: yes

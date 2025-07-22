@@ -1,5 +1,6 @@
 ##### WSO-Config WSO 2.0 #####
-- hosts: all
+- name: WSO Server Config
+  hosts: all
   # turn off in production, some errors are natural and fine
   # but it's useful to keep this on for debugging reasons
   ignore_errors: no
