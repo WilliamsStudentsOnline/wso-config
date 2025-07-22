@@ -32,6 +32,7 @@ Jobs should never fail, but some jobs always result in a change or a skip. If a 
 
 ## Tips For A 10/10 Pull Request
 - Make sure you run your code in a testing VM before you push it to the repository. This is super important! It's very hard to undo a bad Ansible script and easy to deploy a good one.
+- **Always** run `ansible-lint` on your code! It is a very good auditor of bad behavior. In the future, it will run as a GitHub action on this repository, so you won't be able to deploy without appeasing it! It demands good code of you. Working Ansible is not always good Ansible.
 - Also open a pull request on the [wiki](https://github.com/WilliamsStudentsOnline/wiki). Remember, it's important that future WSO members understand how our infrastructure works, so failing to do this is important.
 - Write, and try to replace, all unidiomatic Ansible with better versions:
   - Don't write the same command over and over again, use `loop:` or other commands.
