@@ -2,4 +2,3 @@ host_name: "wso-dev"
 system_motd: "motd-development"
 machine_packages:
   - go
-
