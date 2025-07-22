@@ -108,7 +108,7 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Copy MiniMOTD config files
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: mc
@@ -143,7 +143,7 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Dynmap config file
-  copy:
+  ansible.builtin.copy:
     src: dynmap-config.txt
     dest: /opt/minecraft/plugins/dynmap/configuration.txt
     force: yes
@@ -151,7 +151,7 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Copy ChunkyBorder config files
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: mc
@@ -171,7 +171,7 @@
 
 # it's lowkey evil that we must do this, but I don't want data leaks
 - name: Disable Minecraft telemetry (bStats)
-  copy:
+  ansible.builtin.copy:
     src: config-bStats.yml
     dest: /opt/minecraft/plugins/bStats/config.yml
     mode: 0755
@@ -180,7 +180,7 @@
 # Unfortunately, you'll need to add your own datapacks.
 
 - name: Accept Minecraft EULA
-  copy:
+  ansible.builtin.copy:
     dest: /opt/minecraft/eula.txt
     content: "eula=true\n"
     force: yes
@@ -188,14 +188,14 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Minecraft launch script
-  copy:
+  ansible.builtin.copy:
     src: start.sh
     dest: /opt/minecraft/start.sh
     mode: 0755
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Minecraft manual launch script
-  copy:
+  ansible.builtin.copy:
     src: start.sh
     dest: /opt/minecraft/start-manually.sh
     mode: 0755
@@ -211,6 +211,7 @@
 
 # TODO: when you deploy this, remember to change server.preferences
 # to bind correctly so mcrcon can read it!
+# also you still need to compile it yourself.
 - name: Chown mcrcon to mc user
   ansible.builtin.command: chown -R mc:mc /opt/mcrcon
   when: inventory_hostname == 'wso_prod'
@@ -229,7 +230,7 @@
       }'    
 
 - name: Create Minecraft server properties
-  copy:
+  ansible.builtin.copy:
     src: server.properties
     dest: /opt/minecraft/server.properties
     force: no
@@ -237,7 +238,7 @@
   when: inventory_hostname == 'wso_prod'
 
 - name: Copy Minecraft systemd service
-  copy:
+  ansible.builtin.copy:
     src: minecraft.service
     force: yes
     dest: /usr/lib/systemd/system/minecraft.service
