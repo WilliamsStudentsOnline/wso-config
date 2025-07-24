@@ -1,5 +1,17 @@
 ##### WSO-Config WSO 2.0 #####
 
+# okay, so we basically have the following setup:
+# - there's the base MC server (paper)
+# - dynmap is for the map, and will be apache bound to its own subsite, not its custom port
+# - mcrcon is going to be allowed but with a super duper strong password
+# - chunky is a one-time affair: use it to render in the 8k world, 1k world_nether, and 8k end one time
+# - cron jobs are going to run every morning at 3AM to update the dynmap
+# - viaversion and maybe geiser are there to allow connections from weird mc versions
+# - maybe a resource pack from vanilla tweaks. MAYBE.
+# - lucky perms is there to prevent users from going nuts with the commands
+# with this setup, the server basically manages itself, and users can use it as they want.
+# still going to write a custom plugin and put it somewhere and it'll give every player a rulebook item & tellraw rules
+
 - name: Install dependencies
   ansible.builtin.dnf:
     name: java-21-openjdk-headless
@@ -25,31 +37,25 @@
     recurse: yes
   when: inventory_hostname == 'wso_prod'
 
+# spark comes pre-bundled with paper now.
+
+# 1.21.7 compatible
 - name: Download Paper JAR
   ansible.builtin.get_url:
-  # TODO: paper has updated, but we're waiting for just ChunkyBorder to update...
-    url: https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/232/downloads/paper-1.21.4-232.jar
+    url: https://fill-data.papermc.io/v1/objects/83838188699cb2837e55b890fb1a1d39ad0710285ed633fbf9fc14e9f47ce078/paper-1.21.7-32.jar
     dest: /opt/minecraft/paper.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
-# TODO: check all of these plugins before any update!
-# we are running 1.21.4. at some point, we should update to 1.21.7, and then fix the version there.
-
-- name: Download Spark plugin
-  ansible.builtin.get_url:
-    url: https://ci.lucko.me/job/spark/487/artifact/spark-bukkit/build/libs/spark-1.10.138-bukkit.jar
-    dest: /opt/minecraft/plugins/spark.jar
-    mode: 0644
-  when: inventory_hostname == 'wso_prod'
-
+# 1.21.7 compatible
 - name: Download Chunky plugin
   ansible.builtin.get_url:
-    url: https://cdn.modrinth.com/data/fALzjamp/versions/SmZRkQyR/Chunky-Bukkit-1.4.36.jar
+    url: https://cdn.modrinth.com/data/fALzjamp/versions/P3y2MXnd/Chunky-Bukkit-1.4.40.jar
     dest: /opt/minecraft/plugins/chunky.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
+# 1.21.7 compatible
 - name: Download ChunkyBorder plugin
   ansible.builtin.get_url:
     url: https://cdn.modrinth.com/data/s86X568j/versions/asaBBItO/ChunkyBorder-Bukkit-1.2.23.jar
@@ -57,48 +63,59 @@
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
+# 1.21.7 compatible
 - name: Download ViaVersion plugin
   ansible.builtin.get_url:
-    url: https://cdn.modrinth.com/data/P1OZGk5p/versions/cdC9vQSF/ViaVersion-5.3.2.jar
+    url: https://cdn.modrinth.com/data/P1OZGk5p/versions/e4eSuLAu/ViaVersion-5.4.2.jar
     dest: /opt/minecraft/plugins/viaversion.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
+# 1.21.7 compatible
+- name: Download ViaVersionStatus plugin
+  ansible.builtin.get_url:
+    url: https://cdn.modrinth.com/data/PzvpAa1j/versions/2IhfwIG1/ViaVersionStatus-4.00.jar
+    dest: /opt/minecraft/plugins/viaversion.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
+# TODO: read this at some point
+# https://github-wiki-see.page/m/mikeprimm/dynmap/wiki/HD-Map-Configuration
+
+# 1.21.7 compatible
 - name: Download Dynmap plugin
   ansible.builtin.get_url:
-    url: https://cdn.modrinth.com/data/fRQREgAc/versions/ImNNT17B/Dynmap-3.7-beta-8-spigot.jar
+    url: https://dynmap.us/builds/dynmap/Dynmap-3.7-SNAPSHOT-spigot.jar
     dest: /opt/minecraft/plugins/dynmap.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
-- name: Download SeeMore plugin
-  ansible.builtin.get_url:
-    url: https://cdn.modrinth.com/data/IEt1Yy3F/versions/QXCh3qCi/SeeMore-1.0.2.jar
-    dest: /opt/minecraft/plugins/seemore.jar
-    mode: 0644
-  when: inventory_hostname == 'wso_prod'
-
+# 1.21.7 compatible
 - name: Download MiniMOTD plugin
   ansible.builtin.get_url:
-    url: https://cdn.modrinth.com/data/16vhQOQN/versions/SgOOeke0/minimotd-bukkit-2.1.5.jar
+    url: https://cdn.modrinth.com/data/16vhQOQN/versions/SHT4Xj7n/minimotd-bukkit-2.1.7.jar
     dest: /opt/minecraft/plugins/mini-motd.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
-
-- name: Download EssentialsX plugin
-  ansible.builtin.get_url:
-    url: https://cdn.modrinth.com/data/hXiIvTyT/versions/SKQwLLoQ/EssentialsX-2.21.0.jar
-    dest: /opt/minecraft/plugins/essentialsx.jar
-    mode: 0644
-  when: inventory_hostname == 'wso_prod'
-
+  
+# 1.21.7 compatible
 - name: Download LuckPerms plugin
   ansible.builtin.get_url:
-    url: https://download.luckperms.net/1594/bukkit/loader/LuckPerms-Bukkit-5.5.9.jar
+    url: https://cdn.modrinth.com/data/Vebnzrzj/versions/ZPtLedoF/LuckPerms-Bukkit-5.5.0.jar
     dest: /opt/minecraft/plugins/essentialsx.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
-  
+
+# 1.21.7 compatible
+- name: Download CalcMod plugin
+  ansible.builtin.get_url:
+    url: https://cdn.modrinth.com/data/XoHTb2Ap/versions/kp4tHG1E/calcmod-1.4.2%2Bpaper.1.21.5.jar
+    dest: /opt/minecraft/plugins/essentialsx.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
+# we used to use coreprotect, but it's paid now, so no dice. if that changes, add it back
+
 - name: Create MiniMOTD directories
   ansible.builtin.file:
     path: /opt/minecraft/plugins/MiniMOTD/icons
@@ -118,14 +135,7 @@
     - { src: "minimotd_main.conf", dest: "/opt/minecraft/plugins/MiniMOTD/main.conf" }
     - { src: "minimotd_plugin_settings.conf", dest: "/opt/minecraft/plugins/MiniMOTD/plugin_settings.conf" }
     - { src: "ephelia_face_smol.png", dest: "/opt/minecraft/plugins/MiniMOTD/icons/" }
-
-- name: Download CoreProtect plugin
-  ansible.builtin.get_url:
-    url: https://cdn.modrinth.com/data/Lu3KuzdV/versions/llmrc4cl/CoreProtect-22.4.jar
-    dest: /opt/minecraft/plugins/core-protect.jar
-    mode: 0644
-  when: inventory_hostname == 'wso_prod'
-
+    
 - name: Create ChunkyBorder directories
   ansible.builtin.file:
     path: /opt/minecraft/plugins/ChunkyBorder
