@@ -3,8 +3,8 @@
   hosts: all
   # turn off in production, some errors are natural and fine
   # but it's useful to keep this on for debugging reasons
-  ignore_errors: no
-  become: yes
+  ignore_errors: false
+  become: true
   roles:
     # essential configuration
     - branding
@@ -35,8 +35,7 @@
     - service_jenkins
     - service_mediawiki
     - service_cachet
-    - service_minecraft # TODO: edit on prod
-    
+    - service_minecraft # TODO: edit on prod    
     # service_clamd exists, but is highly buggy and is thus removed.
     # if you want to use it, you'll need to fix it yourself.
 

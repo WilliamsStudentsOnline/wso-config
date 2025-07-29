@@ -32,7 +32,7 @@
 - name: Enable and start webmin
   ansible.builtin.systemd:
     name: webmin
-    enabled: yes
+    enabled: true
     state: started
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 

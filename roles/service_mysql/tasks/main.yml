@@ -11,7 +11,7 @@
 - name: Enable and start mysqld
   ansible.builtin.systemd:
     name: mysqld
-    enabled: yes
+    enabled: true
     state: started
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
     

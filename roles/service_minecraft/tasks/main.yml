@@ -12,6 +12,11 @@
 # with this setup, the server basically manages itself, and users can use it as they want.
 # still going to write a custom plugin and put it somewhere and it'll give every player a rulebook item & tellraw rules
 
+
+# TODO: look into lazymc: https://github.com/timvisee/lazymc?tab=readme-ov-file
+# also TODO: switch to BlueMap https://bluemap.bluecolored.de/community/BluemapLazyServer.html
+
+
 - name: Install dependencies
   ansible.builtin.dnf:
     name: java-21-openjdk-headless
@@ -25,8 +30,8 @@
      uid: 2011 # year minecraft 1.0.0 released
      shell: /bin/false
      home: /opt/minecraft
-     create_home: yes
-     skeleton: "" # never logged into so no need for it
+     create_home: true
+     skeleton: "" # never logged into so false need for it
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Minecraft directories
@@ -34,10 +39,10 @@
     path: /opt/minecraft/plugins
     state: directory
     owner: mc
-    recurse: yes
+    recurse: true
   when: inventory_hostname == 'wso_prod'
 
-# spark comes pre-bundled with paper now.
+# spark comes pre-bundled with paper falsew.
 
 # 1.21.7 compatible
 - name: Download Paper JAR
@@ -72,10 +77,18 @@
   when: inventory_hostname == 'wso_prod'
 
 # 1.21.7 compatible
+- name: Download ViaBackwards plugin
+  ansible.builtin.get_url:
+    url: https://cdn.modrinth.com/data/NpvuJQoq/versions/tdyh8oTV/ViaBackwards-5.4.2.jar
+    dest: /opt/minecraft/plugins/viabackwards.jar
+    mode: 0644
+  when: inventory_hostname == 'wso_prod'
+
+# 1.21.7 compatible
 - name: Download ViaVersionStatus plugin
   ansible.builtin.get_url:
     url: https://cdn.modrinth.com/data/PzvpAa1j/versions/2IhfwIG1/ViaVersionStatus-4.00.jar
-    dest: /opt/minecraft/plugins/viaversion.jar
+    dest: /opt/minecraft/plugins/viaversion-status.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
@@ -110,18 +123,18 @@
 - name: Download CalcMod plugin
   ansible.builtin.get_url:
     url: https://cdn.modrinth.com/data/XoHTb2Ap/versions/kp4tHG1E/calcmod-1.4.2%2Bpaper.1.21.5.jar
-    dest: /opt/minecraft/plugins/essentialsx.jar
+    dest: /opt/minecraft/plugins/calcmod.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
-# we used to use coreprotect, but it's paid now, so no dice. if that changes, add it back
+# we used to use coreprotect, but it's paid falsew, so false dice. if that changes, add it back
 
 - name: Create MiniMOTD directories
   ansible.builtin.file:
     path: /opt/minecraft/plugins/MiniMOTD/icons
     state: directory
     owner: mc
-    recurse: yes
+    recurse: true
   when: inventory_hostname == 'wso_prod'
 
 - name: Copy MiniMOTD config files
@@ -129,7 +142,7 @@
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: mc
-    force: yes
+    force: true
   when: inventory_hostname == 'wso_prod'
   loop:
     - { src: "minimotd_main.conf", dest: "/opt/minecraft/plugins/MiniMOTD/main.conf" }
@@ -141,7 +154,7 @@
     path: /opt/minecraft/plugins/ChunkyBorder
     state: directory
     owner: mc
-    recurse: yes
+    recurse: true
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Dynmap directories
@@ -149,14 +162,14 @@
     path: /opt/minecraft/plugins/dynmap
     state: directory
     owner: mc
-    recurse: yes
+    recurse: true
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Dynmap config file
   ansible.builtin.copy:
     src: dynmap-config.txt
     dest: /opt/minecraft/plugins/dynmap/configuration.txt
-    force: yes
+    force: true
     owner: mc
   when: inventory_hostname == 'wso_prod'
 
@@ -165,7 +178,7 @@
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: mc
-    force: yes
+    force: true
   when: inventory_hostname == 'wso_prod'
   loop:
     - { src: "borders.json", dest: "/opt/minecraft/plugins/ChunkyBorders/" }
@@ -176,7 +189,7 @@
     path: /opt/minecraft/plugins/bStats
     state: directory
     owner: mc
-    recurse: yes
+    recurse: true
   when: inventory_hostname == 'wso_prod'
 
 # it's lowkey evil that we must do this, but I don't want data leaks
@@ -193,7 +206,7 @@
   ansible.builtin.copy:
     dest: /opt/minecraft/eula.txt
     content: "eula=true\n"
-    force: yes
+    force: true
     owner: mc
   when: inventory_hostname == 'wso_prod'
 
@@ -217,6 +230,8 @@
   ansible.builtin.git:
     repo: 'https://github.com/Tiiffi/mcrcon'
     dest: /opt/mcrcon
+    update: no
+    version: v0.7.2
   when: inventory_hostname == 'wso_prod'
 
 # TODO: when you deploy this, remember to change server.preferences
@@ -227,30 +242,29 @@
   when: inventory_hostname == 'wso_prod'
 
 # TODO: make more of these that handle the render commands
-- name: "Create mcrcon cronjob: broadcast server render warning"
-  ansible.builtin.cron:
-    name: "MC Server Render Warning"
-    hour: "3"
-    minute: "0"
-    disabled: true
-    job: >
-      mcrcon -H localhost -p $PASSWORD
-      'tellraw @p {
-        "text": "Server will start rendering soon!\nThis will significantly degrade performance. Consider logging off and going to bed."
-      }'    
+# - name: "Create mcrcon cronjob: broadcast server render warning"
+#   ansible.builtin.cron:
+#     name: "MC Server Render Warning"
+#     disabled: true
+#     job: >
+#       mcrcon -H localhost -p $PASSWORD
+#       'tellraw @p {
+#         "text": "Server will start rendering soon!\nThis will significantly degrade performance. Consider logging off and going to bed."
+#       }'
+#   when: inventory_hostname == 'wso_prod'
 
 - name: Create Minecraft server properties
   ansible.builtin.copy:
     src: server.properties
     dest: /opt/minecraft/server.properties
-    force: no
+    force: false
     mode: 0755
   when: inventory_hostname == 'wso_prod'
 
 - name: Copy Minecraft systemd service
   ansible.builtin.copy:
     src: minecraft.service
-    force: yes
+    force: true
     dest: /usr/lib/systemd/system/minecraft.service
   when: inventory_hostname == 'wso_prod'
 
@@ -259,7 +273,7 @@
 # - name: Enable and start Minecraft
 #   systemd:
 #     name: minecraft
-#     enabled: yes
+#     enabled: true
 #     state: started
 #   when: inventory_hostname == 'wso_prod'
 

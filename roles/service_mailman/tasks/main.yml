@@ -14,7 +14,7 @@
      uid: 1984 # because why not
      shell: /bin/false
      group: mailman
-     create_home: no
+     create_home: false
      skeleton: "" # never logged into so no need for it
      state: present
   when: inventory_hostname == 'wso_prod'
@@ -56,7 +56,7 @@
   ansible.builtin.git:
     repo: 'https://github.com/ansible/ansible.git'
     dest: /opt/mailman/docker-mailman
-    update: no
+    update: false
   when: inventory_hostname == 'wso_prod'
 
 - name: Fix perms for Docker Mailman
@@ -66,7 +66,7 @@
 - name: Install systemd service unit for Mailman Docker Compose
   ansible.builtin.copy:
     src: mailman.service
-    force: yes
+    force: true
     dest: /usr/lib/systemd/system/mailman.service
     mode: '0644'
   when: inventory_hostname == 'wso_prod'
@@ -78,7 +78,7 @@
 # - name: Enable and start Mailman service
 #   systemd:
 #     name: mailman
-#     enabled: yes
+#     enabled: true
 #     state: started
 #   when: inventory_hostname == 'wso_prod'
 

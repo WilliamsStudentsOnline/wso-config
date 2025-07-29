@@ -5,8 +5,8 @@
     name: trivia
     comment: Trivia FTP Access
     uid: 1755 # year Ephraim Williams died in battle
-    create_home: yes
+    create_home: true
     shell: /bin/bash
-    generate_ssh_key: yes
+    generate_ssh_key: true
     ssh_key_type: "ed25519"
     ssh_key_comment: "Ansible-generated Trivia FTP access key on $HOSTNAME"

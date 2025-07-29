@@ -65,7 +65,7 @@
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "/backup/theme/{{ item }}"
-    force: yes
+    force: true
   loop:
     - header.html
     - footer.html
@@ -82,7 +82,7 @@
 - name: Deploy Apaxy vhost
   ansible.builtin.copy:
     dest: /etc/httpd/conf.d/apaxy.conf
-    force: yes
+    force: true
     # accessible on localhost/backup
     content: |
           Alias /backup /backup
@@ -163,7 +163,7 @@
 - name: Add SSH identity config for peer
   ansible.builtin.blockinfile:
     path: /root/.ssh/config
-    create: yes
+    create: true
     owner: root
     group: root
     mode: '0600'
@@ -171,12 +171,12 @@
       Host wso_backup
         IdentityFile /root/.ssh/borg_key
         User root
-        IdentitiesOnly yes
+        IdentitiesOnly true
 
       Host wso_prod
         IdentityFile /root/.ssh/borg_key
         User root
-        IdentitiesOnly yes
+        IdentitiesOnly true
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: enable user_allow_other in fuse.conf
@@ -211,7 +211,7 @@
 # - name: enable and start sshfs mount unit
 #   systemd:
 #     name: "{{ local_path | regex_replace('^/', '') }}.mount"
-#     enabled: yes
+#     enabled: true
 #     state: started
 #   when: local_path is defined
 
@@ -219,7 +219,7 @@
   ansible.builtin.copy:
     src: backer-upper.sh
     dest: /root/
-    force: yes
+    force: true
   when: inventory_hostname == 'wso_prod'
 
 - name: Make Borg cronjob log backup

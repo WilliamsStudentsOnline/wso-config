@@ -8,20 +8,20 @@
 - name: Enable and start firewalld
   ansible.builtin.systemd:
     name: firewalld
-    enabled: yes
+    enabled: true
     state: started
 
 - name: Set default zone to public
   ansible.posix.firewalld:
-    immediate: yes
-    permanent: yes
+    immediate: true
+    permanent: true
     state: enabled
     zone: public
 
 - name: Set default target to DROP
   ansible.posix.firewalld:
     state: enabled
-    permanent: yes
+    permanent: true
     zone: public
     target: DROP
 
@@ -32,42 +32,42 @@
 - name: Allow SSH
   ansible.posix.firewalld:
     service: ssh
-    permanent: yes
+    permanent: true
     state: enabled
 
 - name: Allow HTTP
   ansible.posix.firewalld:
     service: http
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
 
 - name: Allow HTTPS
   ansible.posix.firewalld:
     service: https
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
 
 - name: Allow NTP
   ansible.posix.firewalld:
     port: 123/udp
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
 
 - name: Allow Grafana
   ansible.posix.firewalld:
     port: 3000/tcp
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
 
 - name: Allow Prometheus
   ansible.posix.firewalld:
     port: 9090/tcp
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
 
 # for testing, disable in prod
@@ -75,21 +75,21 @@
   ansible.posix.firewalld:
     port: 9100/tcp
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
 
 - name: Allow Webmin
   ansible.posix.firewalld:
     port: 10000/tcp
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
 
 - name: Allow Jenkins
   ansible.posix.firewalld:
     port: 8080/tcp
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
   when: inventory_hostname in ['wso_prod', 'wso_dev']
 
@@ -97,7 +97,7 @@
   ansible.posix.firewalld:
     port: 8000/tcp
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
   when: inventory_hostname == 'wso_prod'
 
@@ -105,7 +105,7 @@
   ansible.posix.firewalld:
     port: 25/tcp
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
   when: inventory_hostname == 'wso_prod'
 
@@ -113,7 +113,7 @@
   ansible.posix.firewalld:
     port: 587/tcp
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
   when: inventory_hostname == 'wso_prod'
 
@@ -121,7 +121,7 @@
   ansible.posix.firewalld:
     port: 993/tcp
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
   when: inventory_hostname == 'wso_prod'
 
@@ -129,7 +129,7 @@
   ansible.posix.firewalld:
     port: 25565/tcp
     zone: public
-    permanent: yes
+    permanent: true
     state: enabled
   when: inventory_hostname == 'wso_prod'
 

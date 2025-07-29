@@ -11,6 +11,6 @@
 - name: Enable and start oomd
   ansible.builtin.systemd:
     name: systemd-oomd
-    enabled: yes
+    enabled: true
     state: started
 

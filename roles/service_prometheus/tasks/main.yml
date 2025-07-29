@@ -21,18 +21,18 @@
   ansible.builtin.unarchive:
     src: /tmp/prometheus.tar.gz
     dest: /tmp
-    remote_src: yes
+    remote_src: true
   when: inventory_hostname == 'wso_prod'
 
 - name: Extract Prometheus Node Exporter
   ansible.builtin.unarchive:
     src: /tmp/node.tar.gz
     dest: /tmp
-    remote_src: yes
+    remote_src: true
 
 - name: Move Prometheus binary
   ansible.builtin.copy:
-    remote_src: yes
+    remote_src: true
     src: /tmp/prometheus-3.4.1.linux-arm64/prometheus
     dest: /usr/local/bin/prometheus
     mode: '0755'
@@ -40,7 +40,7 @@
 
 - name: Move Prometheus Node Exporter binary
   ansible.builtin.copy:
-    remote_src: yes
+    remote_src: true
     src: /tmp/node_exporter-1.9.1.linux-arm64/node_exporter
     dest: /usr/local/bin/node_exporter
     mode: '0755'
@@ -68,14 +68,14 @@
 - name: Create Prometheus user
   ansible.builtin.user:
     name: prometheus
-    system: yes
+    system: true
     shell: /sbin/nologin
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Prometheus Node Exporter user
   ansible.builtin.user:
     name: node_exporter
-    system: yes
+    system: true
     shell: /sbin/nologin
 
 - name: Make Prometheus data directories
@@ -92,19 +92,19 @@
 
 - name: Reload systemd
   ansible.builtin.systemd:
-    daemon_reload: yes
+    daemon_reload: true
 
 - name: Enable & start Prometheus
   ansible.builtin.systemd:
     name: prometheus
-    enabled: yes
+    enabled: true
     state: started
   when: inventory_hostname == 'wso_prod'
 
 - name: Enable & start Prometheus
   ansible.builtin.systemd:
     name: node_exporter
-    enabled: yes
+    enabled: true
     state: started
 
 # TODO: configure Prometheus

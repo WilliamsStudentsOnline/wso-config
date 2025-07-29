@@ -14,13 +14,13 @@
   ansible.builtin.copy:
     src: scan.conf
     dest: /etc/clamd.d/scan.conf
-    force: no
+    force: false
     
 # - name: Ensure freshclam config exists
 #   ansible.builtin.copy:
 #     src: /etc/freshclam.conf
 #     dest: /etc/freshclam.conf
-#     remote_src: yes
+#     remote_src: true
 #     force: no
 
 - name: Create virus database dir
@@ -40,7 +40,7 @@
 - name: Enable and start clamd
   ansible.builtin.systemd:
     name: clamd@scan
-    enabled: yes
+    enabled: true
     state: started
 
 # TODO: we want to make this better

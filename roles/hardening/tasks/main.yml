@@ -2,7 +2,7 @@
 
 # force this on
 - name: Enable SELinux enforcing
-  ansible.builtin.selinux:
+  ansible.posix.selinux:
     policy: targeted
     state: enforcing
 
@@ -12,7 +12,7 @@
     name: "{{ item.key }}"
     value: "{{ item.value }}"
     state: present
-    reload: yes
+    reload: true
   loop: "{{ hardening_sysctls }}"
 
 - name: Harden weak permissions
@@ -28,7 +28,7 @@
 - name: Disable insecure service kdump
   ansible.builtin.systemd:
     name: kdump
-    enabled: no
+    enabled: false
     state: stopped
 
 # TODO: tighten security on PAM and /etc/shadow. we need more secure password gen

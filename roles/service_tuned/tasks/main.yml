@@ -8,7 +8,7 @@
 - name: Enable tuned
   ansible.builtin.systemd:
     name: tuned
-    enabled: yes
+    enabled: true
     state: started
     
 # TODO: test this against the other profile, latency-performance, and see

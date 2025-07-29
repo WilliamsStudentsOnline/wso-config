@@ -18,5 +18,5 @@
   ansible.builtin.copy:
     src: "{{ system_motd }}"
     dest: /etc/motd
-    backup: yes
+    backup: true
   when: system_motd is defined

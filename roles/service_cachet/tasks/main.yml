@@ -21,7 +21,7 @@
   ansible.builtin.git:
     repo: 'https://github.com/cachethq/Cachet.git'
     dest: /srv/www/cachet
-    update: no
+    update: false
   when: inventory_hostname == 'wso_backup'
 
 - name: Set permissions with shell (recursive chown)
@@ -35,7 +35,7 @@
     - /srv/www
     - /srv/www/cachet
   changed_when: false
-  ignore_errors: yes  # semanage errors if already exists
+  ignore_errors: true  # semanage errors if already exists
   when: inventory_hostname == 'wso_backup'
 
 - name: Restore SELinux context on /srv and subdirs
@@ -71,7 +71,7 @@
 - name: Copy Cachet config file
   ansible.builtin.copy:
     src: env-file
-    force: yes
+    force: true
     dest: /srv/www/cachet/.env
     mode: 0644
     owner: apache
@@ -82,7 +82,7 @@
 - name: Deploy Cachet vhost
   ansible.builtin.copy:
     dest: /etc/httpd/conf.d/cachet.conf
-    force: yes
+    force: true
     content: |
       <VirtualHost *:80>
           ServerName localhost
@@ -105,7 +105,7 @@
     state: restarted
   when: inventory_hostname == 'wso_backup'
 
-# note that this runs as the apache user!
+# falsete that this runs as the apache user!
 - name: Create Cachet cronjob
   when: inventory_hostname == 'wso_backup'
   ansible.builtin.cron:

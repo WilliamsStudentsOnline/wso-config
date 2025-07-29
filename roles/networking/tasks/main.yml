@@ -6,6 +6,6 @@
   ansible.builtin.lineinfile:
     path: /etc/hosts
     line: "{{ hostvars[item].ansible_host | default(item) }} {{ hostvars[item].host_name }}"
-    create: yes
+    create: true
     state: present
   loop: "{{ groups['all'] | difference([inventory_hostname]) }}"

@@ -15,7 +15,7 @@
 
 - name: Update DNF cache after adding repo
   ansible.builtin.dnf:
-    update_cache: yes
+    update_cache: true
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Install Docker and Docker Compose plugin
@@ -31,4 +31,4 @@
   ansible.builtin.systemd:
     name: docker
     state: started
-    enabled: yes
+    enabled: true

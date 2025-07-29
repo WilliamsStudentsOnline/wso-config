@@ -13,13 +13,13 @@
 - name: Copy Grafana repository
   ansible.builtin.copy:
     src: grafana.repo
-    force: yes
+    force: true
     dest: /etc/yum.repos.d/grafana.repo
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Update DNF cache after adding repo
   ansible.builtin.dnf:
-    update_cache: yes
+    update_cache: true
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
 
 - name: Install Grafana
@@ -31,7 +31,7 @@
 - name: Copy Grafana service file
   ansible.builtin.copy:
     src: grafana.service
-    force: yes
+    force: true
     mode: '0755'
     group: 'grafana'
     owner: 'grafana'
@@ -45,7 +45,7 @@
 - name: Copy Grafana configuration file
   ansible.builtin.copy:
     src: grafana-config.ini
-    force: yes
+    force: true
     mode: '0755'
     group: 'grafana'
     owner: 'grafana'
@@ -57,7 +57,7 @@
 - name: Copy Grafana DB file
   ansible.builtin.copy:
     src: grafana.db
-    force: yes
+    force: true
     mode: '0755'
     group: 'grafana'
     owner: 'grafana'
@@ -75,7 +75,7 @@
 - name: Enable and start Grafana
   ansible.builtin.systemd:
     name: grafana
-    enabled: yes
+    enabled: true
     state: started
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
     

@@ -12,7 +12,7 @@
       - php-gd
       - php-apcu
     state: present
-    update_cache: yes
+    update_cache: true
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Ensure proper subdirs exist
@@ -43,7 +43,7 @@
   ansible.builtin.unarchive:
     src: /tmp/mediawiki.tar.gz
     dest: /srv/www/wiki
-    remote_src: yes
+    remote_src: true
     creates: /srv/www/wiki/mediawiki-1.41.1
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
@@ -52,7 +52,7 @@
     src: /srv/www/wiki/mediawiki-1.41.1
     dest: /srv/www/wiki/html
     state: link
-    force: no
+    force: false
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Set permissions with shell (recursive chown)
@@ -66,7 +66,7 @@
     - /srv/www
     - /srv/www/wiki
   changed_when: false
-  ignore_errors: yes  # semanage errors if already exists
+  ignore_errors: true  # semanage errors if already exists
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Restore SELinux context on /srv and subdirs
@@ -91,7 +91,7 @@
 - name: Deploy Apache vhost
   ansible.builtin.copy:
     dest: /etc/httpd/conf.d/wiki.conf
-    force: yes
+    force: true
     content: |
       <VirtualHost *:80>
           ServerName localhost

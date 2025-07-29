@@ -23,7 +23,7 @@
     state: present
 
 - name: Fetch latest stable kernel version
-  ansible.builtin.shell: curl -s https://www.kernel.org/releases.json | jq -r '.latest_stable.version'
+  ansible.builtin.shell: set -euo pipefail && curl -s https://www.kernel.org/releases.json | jq -r '.latest_stable.version'
   register: latest_kernel
   changed_when: false
 
@@ -52,7 +52,7 @@
   ansible.builtin.unarchive:
     src: "/usr/src/{{ kernel_tarball }}"
     dest: "/usr/src"
-    remote_src: yes
+    remote_src: true
   when: kernel_tarball_downloaded is defined and kernel_tarball_downloaded.changed
 
 - name: Symlink /usr/src/linux to extracted kernel
@@ -72,7 +72,7 @@
   ansible.builtin.copy:
     src: "/boot/config-{{ running_kernel.stdout }}"
     dest: "{{ kernel_dir }}/.config"
-    remote_src: yes
+    remote_src: true
   when: kernel_tarball_downloaded is defined and kernel_tarball_downloaded.changed
 
 - name: Run make olddefconfig (best effort, might fail)

@@ -17,10 +17,10 @@
   ansible.builtin.copy:
     src: zram_generator.conf
     dest: /etc/systemd/zram-generator.conf
-    backup: yes
+    backup: true
 
 - name: Enable and start zram-generator
   ansible.builtin.systemd:
     name: systemd-zram-setup@zram0
-    enabled: yes
+    enabled: true
     state: started

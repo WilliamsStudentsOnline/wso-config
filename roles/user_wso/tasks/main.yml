@@ -5,9 +5,9 @@
     name: wso
     comment: WSO Sysadmin Role
     uid: 1793 # year Williams was founded
-    create_home: yes
+    create_home: true
     shell: /bin/zsh
-    generate_ssh_key: yes
+    generate_ssh_key: true
     ssh_key_type: "ed25519"
     ssh_key_comment: "Ansible-generated WSO Sysadmin key on $HOSTNAME"
     
