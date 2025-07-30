@@ -10,3 +10,6 @@
     name: nginx
     enabled: true
     state: started
+
+- name: Unbreak nginx SELinux permissions
+  ansible.builtin.shell: setsebool -P httpd_can_network_connect 1

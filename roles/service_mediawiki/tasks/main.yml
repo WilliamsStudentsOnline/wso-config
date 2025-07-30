@@ -93,20 +93,34 @@
     dest: /etc/nginx/conf.d/wiki.conf
     force: true
     content: |
-    
-         server {
-             listen 80;
-             server_name wiki.local;
+        server {
+               listen 80;
+               server_name wiki.local;
 
-             root /srv/www/wiki/html;
-             index index.html index.htm;
+               root /srv/www/wiki/html;
+               index index.php index.html index.htm;
 
-             location / {
-                 try_files $uri $uri/ =404;
-             }
-             access_log /var/log/nginx/mediawiki_access.log;
-             error_log /var/log/nginx/mediawiki_error.log;
-         }
+
+               location = /willipedia {
+                        return 302 /willipedia/;
+               }
+
+               location /willipedia/ {
+                        alias /srv/www/wiki/html/;
+                        index index.php index.html;
+
+                        try_files $uri $uri/ /index.php;
+
+                        location ~ \.php$ {
+                                 include fastcgi_params;
+                                 fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;  # adjust as needed
+                                 fastcgi_param SCRIPT_FILENAME $request_filename;
+                                 fastcgi_param SCRIPT_NAME $fastcgi_script_name;
+                        }
+               }
+               access_log /var/log/nginx/mediawiki_access.log;
+               error_log /var/log/nginx/mediawiki_error.log;
+         }            
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Restart Nginx

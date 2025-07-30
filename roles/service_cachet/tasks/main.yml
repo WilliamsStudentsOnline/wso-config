@@ -92,7 +92,11 @@
              root /srv/www/cachet/public;
              index index.html index.htm;
 
-             location / {
+             location = /status {
+                      return 302 /status/;
+             }
+
+             location /status {
                  try_files $uri $uri/ =404;
              }
              access_log /var/log/nginx/cachet_access.log;

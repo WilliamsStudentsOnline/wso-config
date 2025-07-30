@@ -4,7 +4,7 @@ Description=Grafana Server
 Documentation=http://docs.grafana.org
 Wants=network-online.target
 After=network-online.target
-After=prometheus.service prometheus-node-exporter.service
+After=prometheus.service prometheus-node-exporter.service nginx.service
 
 [Service]
 Environment="GF_DATABASE_PATH=/var/lib/grafana/grafana.db"
