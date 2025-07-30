@@ -22,7 +22,7 @@
     - service_fail2ban
     - service_backup
     - service_dnfauto
-    - service_apache
+    - service_nginx
     - service_webmin
     - service_grafana
     - service_prometheus
