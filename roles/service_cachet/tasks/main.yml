@@ -113,7 +113,7 @@
     user: nginx
     disabled: true
     minute: "*"
-    job: "/bin/bash -l -c 'php /path/to/cachet/artisan schedule:run >> /dev/null'"
+    job: "/bin/bash -l -c 'php /srv/www/cachet/artisan schedule:run >> /dev/null'"
   when: inventory_hostname == 'wso_backup'
 
 # note that cachet doesn't have its own systemd daemon. it's a static site served by nginx.

@@ -19,8 +19,8 @@
   ansible.builtin.file:
     path: /srv/www/
     state: directory
-    owner: apache
-    group: apache
+    owner: nginx
+    group: nginx
     mode: '0755'
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
@@ -28,8 +28,8 @@
   ansible.builtin.file:
     path: /srv/www/wiki
     state: directory
-    owner: apache
-    group: apache
+    owner: nginx
+    group: nginx
     mode: '0755'
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
@@ -59,7 +59,7 @@
   ansible.builtin.shell: chown -R apache:apache /srv/www/wiki/html
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
-- name: Set SELinux context on /srv and subdirs for Apache
+- name: Set SELinux context on /srv and subdirs for Nginx
   ansible.builtin.command: semanage fcontext -a -t httpd_sys_content_t "{{ item }}(/.*)?"
   loop:
     - /srv
@@ -73,7 +73,7 @@
   ansible.builtin.command: restorecon -Rv /srv /srv/www /srv/www/wiki
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
-- name: Ensure /srv/www/wiki has o+x for Apache directory access
+- name: Ensure /srv/www/wiki has o+x for Nginx directory access
   ansible.builtin.file:
     path: "{{ item }}"
     mode: '0755'
@@ -93,6 +93,7 @@
     dest: /etc/nginx/conf.d/wiki.conf
     force: true
     content: |
+    
          server {
              listen 80;
              server_name wiki.local;
@@ -103,14 +104,14 @@
              location / {
                  try_files $uri $uri/ =404;
              }
-             access_log /var/log/nginx/cachet_access.log;
-             error_log /var/log/nginx/cachet_error.log;
+             access_log /var/log/nginx/mediawiki_access.log;
+             error_log /var/log/nginx/mediawiki_error.log;
          }
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
-- name: Restart Apache
+- name: Restart Nginx
   ansible.builtin.systemd:
-    name: httpd
+    name: nginx
     state: restarted
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 

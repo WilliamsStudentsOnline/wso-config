@@ -192,6 +192,34 @@
     - {src: "bluemap-webserver.conf", dest: "/opt/minecraft/plugins/BlueMap/webserver.conf"}
     - {src: "bluemap-file.conf", dest: "/opt/minecraft/plugins/BlueMap/storages/file.conf"}
 
+- name: Deploy Bluemap vhost
+  ansible.builtin.copy:
+    dest: /etc/nginx/conf.d/cachet.conf
+    force: true
+    content: |
+         server {
+             listen 80;
+             server_name bluemap.local;
+
+             location / {
+                 proxy_pass http://localhost:X;
+                 proxy_set_header Host $host;
+                 proxy_set_header X-Real-IP $remote_addr;
+                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                 proxy_set_header X-Forwarded-Proto $scheme;
+             }
+             
+             access_log /var/log/nginx/bluemap_access.log;
+             error_log /var/log/nginx/bluemap_error.log;
+         }
+  when: inventory_hostname == 'wso_backup'
+
+- name: Restart Nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+  when: inventory_hostname == 'wso_backup'
+
 # it's lowkey evil that we must do this, but I don't want data leaks
 - name: Disable Minecraft telemetry (bStats)
   ansible.builtin.copy:
