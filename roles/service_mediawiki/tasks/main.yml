@@ -88,23 +88,24 @@
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 # TODO: change this in production
-- name: Deploy Apache vhost
+- name: Deploy Nginx serve
   ansible.builtin.copy:
-    dest: /etc/httpd/conf.d/wiki.conf
+    dest: /etc/nginx/conf.d/wiki.conf
     force: true
     content: |
-      <VirtualHost *:80>
-          ServerName localhost
-          DocumentRoot /srv/www/wiki/html
+         server {
+             listen 80;
+             server_name wiki.local;
 
-          <Directory /srv/www/wiki/html>
-              AllowOverride All
-              Require all granted
-          </Directory>
+             root /srv/www/wiki/html;
+             index index.html index.htm;
 
-          ErrorLog /var/log/httpd/wiki_error.log
-          CustomLog /var/log/httpd/wiki_access.log combined
-      </VirtualHost>
+             location / {
+                 try_files $uri $uri/ =404;
+             }
+             access_log /var/log/nginx/cachet_access.log;
+             error_log /var/log/nginx/cachet_error.log;
+         }
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Restart Apache

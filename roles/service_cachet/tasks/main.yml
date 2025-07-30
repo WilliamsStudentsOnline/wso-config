@@ -12,8 +12,8 @@
   ansible.builtin.file:
     path: /srv/www/
     state: directory
-    owner: apache
-    group: apache
+    owner: nginx
+    group: nginx
     mode: '0755'
   when: inventory_hostname == 'wso_backup'
 
@@ -25,10 +25,10 @@
   when: inventory_hostname == 'wso_backup'
 
 - name: Set permissions with shell (recursive chown)
-  ansible.builtin.shell: chown -R apache:apache /srv/www/cachet
+  ansible.builtin.shell: chown -R nginx:nginx /srv/www/cachet
   when: inventory_hostname == 'wso_backup'
 
-- name: Set SELinux context on /srv and subdirs for Apache
+- name: Set SELinux context on /srv and subdirs for Nginx
   ansible.builtin.command: semanage fcontext -a -t httpd_sys_content_t "{{ item }}(/.*)?"
   loop:
     - /srv
@@ -42,7 +42,7 @@
   ansible.builtin.command: restorecon -Rv /srv /srv/www /srv/www/cachet
   when: inventory_hostname == 'wso_backup'
   
-- name: Ensure /srv/www/wiki has o+x for Apache directory access
+- name: Ensure /srv/www/wiki has o+x for Nginx directory access
   ansible.builtin.file:
     path: "{{ item }}"
     mode: '0755'
@@ -52,18 +52,19 @@
     - /srv/www/cachet
   when: inventory_hostname == 'wso_backup'
 
-- name: Enable Apache access boolean for user content
+- name: Enable Nginx access boolean for user content
   ansible.builtin.command: setsebool -P httpd_read_user_content 1
   when: inventory_hostname == 'wso_backup'
 
 # I don't know WHY it's broken but this fixes it
+# TODO: 777 perms is nasty work
 - name: Fix SELinux perms in Cachet
   ansible.builtin.shell: |
    semanage fcontext -a -t httpd_sys_rw_content_t "/srv/www/cachet/storage(/.*)?"
    semanage fcontext -a -t httpd_sys_rw_content_t "/srv/www/cachet/bootstrap/cache(/.*)?"
    semanage fcontext -a -t httpd_sys_rw_content_t "/srv/www/cachet/database(/.*)?"
    restorecon -Rv /srv/www/cachet/
-   chown apache:apache /srv/www/cachet/database
+   chown nginx:nginx /srv/www/cachet/database
    chmod -R 777 /srv/www/cachet/storage
    chmod -R 777 /srv/www/cachet/bootstrap
   when: inventory_hostname == 'wso_backup' 
@@ -74,51 +75,51 @@
     force: true
     dest: /srv/www/cachet/.env
     mode: 0644
-    owner: apache
-    group: apache
+    owner: nginx
+    group: nginx
   when: inventory_hostname == 'wso_backup'
 
 # TODO: change this in production
 - name: Deploy Cachet vhost
   ansible.builtin.copy:
-    dest: /etc/httpd/conf.d/cachet.conf
+    dest: /etc/nginx/conf.d/cachet.conf
     force: true
     content: |
-      <VirtualHost *:80>
-          ServerName localhost
-          DocumentRoot /srv/www/cachet/public
+         server {
+             listen 80;
+             server_name cachet.local;
 
-          <Directory /srv/www/cachet/public>
-              Options Indexes FollowSymLinks
-              AllowOverride All
-              Require all granted
-          </Directory>
+             root /srv/www/cachet/public;
+             index index.html index.htm;
 
-          ErrorLog /var/log/httpd/cachet_error.log
-          CustomLog /var/log/httpd/cachet_access.log combined
-      </VirtualHost>
+             location / {
+                 try_files $uri $uri/ =404;
+             }
+             access_log /var/log/nginx/cachet_access.log;
+             error_log /var/log/nginx/cachet_error.log;
+         }
   when: inventory_hostname == 'wso_backup'
 
-- name: Restart Apache
+- name: Restart Nginx
   ansible.builtin.systemd:
-    name: httpd
+    name: nginx
     state: restarted
   when: inventory_hostname == 'wso_backup'
 
-# falsete that this runs as the apache user!
+# note that this runs as the nginx user!
 - name: Create Cachet cronjob
-  when: inventory_hostname == 'wso_backup'
   ansible.builtin.cron:
     name: "Refresh Cachet"
-    user: apache
+    user: nginx
     disabled: true
     minute: "*"
     job: "/bin/bash -l -c 'php /path/to/cachet/artisan schedule:run >> /dev/null'"
+  when: inventory_hostname == 'wso_backup'
 
-# note that cachet doesn't have its own systemd daemon. it's a static site served by apache.
+# note that cachet doesn't have its own systemd daemon. it's a static site served by nginx.
 
 # Things you will still need to do:
-# (also, make sure you do all tasks using sudo -u apache)
+# (also, make sure you do all tasks using sudo -u nginx)
 
 # - steps 4-10 on this page: https://docs.cachethq.io/v3.x/installation
 # - enable the scheduler by uncommenting the cron job

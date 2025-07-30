@@ -12,10 +12,8 @@
 # with this setup, the server basically manages itself, and users can use it as they want.
 # still going to write a custom plugin and put it somewhere and it'll give every player a rulebook item & tellraw rules
 
-
 # TODO: look into lazymc: https://github.com/timvisee/lazymc?tab=readme-ov-file
 # also TODO: switch to BlueMap https://bluemap.bluecolored.de/community/BluemapLazyServer.html
-
 
 - name: Install dependencies
   ansible.builtin.dnf:
@@ -25,13 +23,13 @@
 
 - name: Create Minecraft user for security
   ansible.builtin.user:
-     name: mc
-     comment: Minecraft Server User
-     uid: 2011 # year minecraft 1.0.0 released
-     shell: /bin/false
-     home: /opt/minecraft
-     create_home: true
-     skeleton: "" # never logged into so false need for it
+    name: mc
+    comment: Minecraft Server User
+    uid: 2011  # year minecraft 1.0.0 released
+    shell: /bin/false
+    home: /opt/minecraft
+    create_home: true
+    skeleton: ""  # never logged into so false need for it
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Minecraft directories
@@ -42,7 +40,7 @@
     recurse: true
   when: inventory_hostname == 'wso_prod'
 
-# spark comes pre-bundled with paper falsew.
+# spark comes pre-bundled with paper noww.
 
 # 1.21.7 compatible
 - name: Download Paper JAR
@@ -92,14 +90,11 @@
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
-# TODO: read this at some point
-# https://github-wiki-see.page/m/mikeprimm/dynmap/wiki/HD-Map-Configuration
-
 # 1.21.7 compatible
-- name: Download Dynmap plugin
+- name: Download BlueMap plugin
   ansible.builtin.get_url:
-    url: https://dynmap.us/builds/dynmap/Dynmap-3.7-SNAPSHOT-spigot.jar
-    dest: /opt/minecraft/plugins/dynmap.jar
+    url: https://cdn.modrinth.com/data/swbUV1cr/versions/ucikJabQ/bluemap-5.10-spigot.jar
+    dest: /opt/minecraft/plugins/bluemap.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
@@ -110,7 +105,7 @@
     dest: /opt/minecraft/plugins/mini-motd.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
-  
+
 # 1.21.7 compatible
 - name: Download LuckPerms plugin
   ansible.builtin.get_url:
@@ -127,7 +122,8 @@
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
-# we used to use coreprotect, but it's paid falsew, so false dice. if that changes, add it back
+# we used to use coreprotect, but it's paid now, so no dice.
+# if that changes, add it back
 
 - name: Create MiniMOTD directories
   ansible.builtin.file:
@@ -145,32 +141,16 @@
     force: true
   when: inventory_hostname == 'wso_prod'
   loop:
-    - { src: "minimotd_main.conf", dest: "/opt/minecraft/plugins/MiniMOTD/main.conf" }
-    - { src: "minimotd_plugin_settings.conf", dest: "/opt/minecraft/plugins/MiniMOTD/plugin_settings.conf" }
-    - { src: "ephelia_face_smol.png", dest: "/opt/minecraft/plugins/MiniMOTD/icons/" }
-    
+    - {src: "minimotd_main.conf", dest: "/opt/minecraft/plugins/MiniMOTD/main.conf"}
+    - {src: "minimotd_plugin_settings.conf", dest: "/opt/minecraft/plugins/MiniMOTD/plugin_settings.conf"}
+    - {src: "ephelia_face_smol.png", dest: "/opt/minecraft/plugins/MiniMOTD/icons/"}
+
 - name: Create ChunkyBorder directories
   ansible.builtin.file:
     path: /opt/minecraft/plugins/ChunkyBorder
     state: directory
     owner: mc
     recurse: true
-  when: inventory_hostname == 'wso_prod'
-
-- name: Create Dynmap directories
-  ansible.builtin.file:
-    path: /opt/minecraft/plugins/dynmap
-    state: directory
-    owner: mc
-    recurse: true
-  when: inventory_hostname == 'wso_prod'
-
-- name: Create Dynmap config file
-  ansible.builtin.copy:
-    src: dynmap-config.txt
-    dest: /opt/minecraft/plugins/dynmap/configuration.txt
-    force: true
-    owner: mc
   when: inventory_hostname == 'wso_prod'
 
 - name: Copy ChunkyBorder config files
@@ -181,8 +161,8 @@
     force: true
   when: inventory_hostname == 'wso_prod'
   loop:
-    - { src: "borders.json", dest: "/opt/minecraft/plugins/ChunkyBorders/" }
-    - { src: "chunkyborders-config.yml", dest: "/opt/minecraft/plugins/ChunkyBorders/config.yml" }
+    - {src: "borders.json", dest: "/opt/minecraft/plugins/ChunkyBorders/"}
+    - {src: "chunkyborders-config.yml", dest: "/opt/minecraft/plugins/ChunkyBorders/config.yml"}
 
 - name: Create bStats directories
   ansible.builtin.file:
@@ -191,6 +171,26 @@
     owner: mc
     recurse: true
   when: inventory_hostname == 'wso_prod'
+
+- name: Create Bluemap directories
+  ansible.builtin.file:
+    path: /opt/minecraft/plugins/BlueMap/storages
+    state: directory
+    owner: mc
+    recurse: true
+  when: inventory_hostname == 'wso_prod'
+
+- name: Copy Bluemap config files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: mc
+    force: true
+  when: inventory_hostname == 'wso_prod'
+  loop:
+    - {src: "bluemap-core.conf", dest: "/opt/minecraft/plugins/BlueMap/core.conf"}
+    - {src: "bluemap-webserver.conf", dest: "/opt/minecraft/plugins/BlueMap/webserver.conf"}
+    - {src: "bluemap-file.conf", dest: "/opt/minecraft/plugins/BlueMap/storages/file.conf"}
 
 # it's lowkey evil that we must do this, but I don't want data leaks
 - name: Disable Minecraft telemetry (bStats)
@@ -241,18 +241,6 @@
   ansible.builtin.command: chown -R mc:mc /opt/mcrcon
   when: inventory_hostname == 'wso_prod'
 
-# TODO: make more of these that handle the render commands
-# - name: "Create mcrcon cronjob: broadcast server render warning"
-#   ansible.builtin.cron:
-#     name: "MC Server Render Warning"
-#     disabled: true
-#     job: >
-#       mcrcon -H localhost -p $PASSWORD
-#       'tellraw @p {
-#         "text": "Server will start rendering soon!\nThis will significantly degrade performance. Consider logging off and going to bed."
-#       }'
-#   when: inventory_hostname == 'wso_prod'
-
 - name: Create Minecraft server properties
   ansible.builtin.copy:
     src: server.properties
@@ -276,4 +264,3 @@
 #     enabled: true
 #     state: started
 #   when: inventory_hostname == 'wso_prod'
-

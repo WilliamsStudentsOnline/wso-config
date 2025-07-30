@@ -1,12 +1,12 @@
 ##### WSO-Config WSO 2.0 #####
 
-- name: Install apache
+- name: Install nginx
   ansible.builtin.dnf:
-    name: httpd
+    name: nginx
     state: present
 
-- name: Enable and start apache
+- name: Enable and start nginx
   ansible.builtin.systemd:
-    name: httpd
+    name: nginx
     enabled: true
     state: started
