@@ -13,9 +13,8 @@
 # still going to write a custom plugin and put it somewhere and it'll give every player a rulebook item & tellraw rules
 
 # TODO: look into lazymc: https://github.com/timvisee/lazymc?tab=readme-ov-file
-# also TODO: switch to BlueMap https://bluemap.bluecolored.de/community/BluemapLazyServer.html
 
-- name: Install dependencies
+- name: Install Minecraft dependencies
   ansible.builtin.dnf:
     name: java-21-openjdk-headless
     state: present
@@ -28,8 +27,7 @@
     uid: 2011  # year minecraft 1.0.0 released
     shell: /bin/false
     home: /opt/minecraft
-    create_home: true
-    skeleton: ""  # never logged into so false need for it
+    create_home: false
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Minecraft directories
@@ -40,7 +38,7 @@
     recurse: true
   when: inventory_hostname == 'wso_prod'
 
-# spark comes pre-bundled with paper noww.
+# spark comes pre-bundled with paper now.
 
 # 1.21.7 compatible
 - name: Download Paper JAR
@@ -110,7 +108,7 @@
 - name: Download LuckPerms plugin
   ansible.builtin.get_url:
     url: https://cdn.modrinth.com/data/Vebnzrzj/versions/ZPtLedoF/LuckPerms-Bukkit-5.5.0.jar
-    dest: /opt/minecraft/plugins/essentialsx.jar
+    dest: /opt/minecraft/plugins/luckperms.jar
     mode: 0644
   when: inventory_hostname == 'wso_prod'
 
@@ -161,8 +159,8 @@
     force: true
   when: inventory_hostname == 'wso_prod'
   loop:
-    - {src: "borders.json", dest: "/opt/minecraft/plugins/ChunkyBorders/"}
-    - {src: "chunkyborders-config.yml", dest: "/opt/minecraft/plugins/ChunkyBorders/config.yml"}
+    - {src: "borders.json", dest: "/opt/minecraft/plugins/ChunkyBorder/"}
+    - {src: "chunkyborders-config.yml", dest: "/opt/minecraft/plugins/ChunkyBorder/config.yml"}
 
 - name: Create bStats directories
   ansible.builtin.file:
@@ -258,7 +256,7 @@
   ansible.builtin.git:
     repo: 'https://github.com/Tiiffi/mcrcon'
     dest: /opt/mcrcon
-    update: no
+    update: false
     version: v0.7.2
   when: inventory_hostname == 'wso_prod'
 
@@ -284,10 +282,14 @@
     dest: /usr/lib/systemd/system/minecraft.service
   when: inventory_hostname == 'wso_prod'
 
+- name: Chown Minecraft to mc user
+  ansible.builtin.command: chown -R mc:mc /opt/minecraft
+  when: inventory_hostname == 'wso_prod'
+
 # TODO: switch this on for prod, but on test VMs it's too intensive
 
 # - name: Enable and start Minecraft
-#   systemd:
+#   ansible.builtin.systemd:
 #     name: minecraft
 #     enabled: true
 #     state: started
