@@ -54,11 +54,7 @@
     state: link
     force: false
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
-
-- name: Set permissions with shell (recursive chown)
-  ansible.builtin.shell: chown -R apache:apache /srv/www/wiki/html
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
-
+  
 - name: Set SELinux context on /srv and subdirs for Nginx
   ansible.builtin.command: semanage fcontext -a -t httpd_sys_content_t "{{ item }}(/.*)?"
   loop:
@@ -83,8 +79,12 @@
     - /srv/www/wiki
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
-- name: Enable Apache access boolean for user content
+- name: Enable Nginx access boolean for user content
   ansible.builtin.command: setsebool -P httpd_read_user_content 1
+  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
+
+- name: Set permissions with shell (recursive chown)
+  ansible.builtin.shell: chown -R nginx:nginx /srv/www/wiki/html
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 # TODO: change this in production
