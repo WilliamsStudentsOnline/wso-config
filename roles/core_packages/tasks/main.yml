@@ -20,6 +20,8 @@
       - setools
       - fuse
       - unzip
+      - netcat
+      - nmap      
       - fastfetch
       - ncdu      
 
