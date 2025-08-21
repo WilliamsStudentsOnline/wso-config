@@ -1,238 +1,35 @@
 ##### WSO-Config WSO 2.0 #####
-- name: Create backup directory (backup server)
-  ansible.builtin.file:
-    path: /backup
-    state: directory
-    mode: '0755'
-  when: inventory_hostname == 'wso_backup'
-
-# TODO: migrate to Nginx
-
-# - name: Check if Apaxy is installed
-#   ansible.builtin.stat:
-#     path: /backup/.htaccess
-#   register: apaxy_flag
-
-# # https://github.com/oupala/apaxy
-# - name: Download Apaxy
-#   ansible.builtin.get_url:
-#     url: https://github.com/oupala/apaxy/archive/main.zip
-#     dest: /backup
-#     mode: 0644
-#   when:
-#   - inventory_hostname == 'wso_backup'
-#   - not apaxy_flag.stat.exists
-
-# - name: Unzip Apaxy
-#   ansible.builtin.shell: cd /backup && unzip apaxy-main.zip && mv apaxy-main/apaxy/* . && rm -rf apaxy-main
-#   when:
-#   - inventory_hostname == 'wso_backup'
-#   - not apaxy_flag.stat.exists
-
-# - name: Replace {FOLDERNAME} with /backup in Apaxy configuration
-#   ansible.builtin.replace:
-#      path: "/backup/htaccess.txt"
-#      regexp: '\{FOLDERNAME\}'
-#      replace: '/backup'
-#   when:
-#   - inventory_hostname == 'wso_backup'
-#   - not apaxy_flag.stat.exists
-  
-# - name: Find html files in /backup/theme
-#   ansible.builtin.find:
-#     paths: /backup/theme
-#     patterns: '*.html'
-#   register: html_files
-#   when:
-#   - inventory_hostname == 'wso_backup'
-#   - not apaxy_flag.stat.exists
-  
-# - name: replace {FOLDERNAME} with /backup in each html file
-#   ansible.builtin.replace:
-#     path: "{{ item.path }}"
-#     regexp: '\{FOLDERNAME\}'
-#     replace: '/backup'
-#   loop: "{{ html_files.files }}"
-#   when:
-#   - inventory_hostname == 'wso_backup'
-#   - not apaxy_flag.stat.exists
-  
-# - name: Move Apache file to get Apaxy started
-#   ansible.builtin.shell: mv /backup/htaccess.txt /backup/.htaccess
-#   when:
-#   - inventory_hostname == 'wso_backup'
-#   - not apaxy_flag.stat.exists
-
-# - name: Fix the Apaxy default theme
-#   ansible.builtin.copy:
-#     src: "{{ item }}"
-#     dest: "/backup/theme/{{ item }}"
-#     force: true
-#   loop:
-#     - header.html
-#     - footer.html
-#   when: inventory_hostname == 'wso_backup'
-      
-# - name: Fix SELinux perms on /backup
-#   ansible.builtin.shell: |
-#    semanage fcontext -a -t httpd_sys_rw_content_t "/backup(/.*)?"
-#    restorecon -Rv /backup
-#    chown apache:apache /backup
-#    chmod -R o+rx /backup
-#   when: inventory_hostname == 'wso_backup'
-
-# - name: Deploy Apaxy vhost
-#   ansible.builtin.copy:
-#     dest: /etc/httpd/conf.d/apaxy.conf
-#     force: true
-#     # accessible on localhost/backup
-#     content: |
-#           Alias /backup /backup
-#           <Directory /backup>
-#               Options +Indexes
-#               AllowOverride All
-#               Require all granted
-#           </Directory>
-#   when: inventory_hostname == 'wso_backup'
-
-# - name: Restart Apache
-#   ansible.builtin.systemd:
-#     name: httpd
-#     state: restarted
-#   when: inventory_hostname == 'wso_backup'
-  
-- name: Create remote directory (remote server)
-  ansible.builtin.file:
-    path: /remote
-    state: directory
-    mode: '0755'
-  when: inventory_hostname == 'wso_backup'
-
-- name: Create backup directory (prod server)
-  ansible.builtin.file:
-    path: /backup
-    state: directory
-    mode: '0755'
-  when: inventory_hostname == 'wso_prod'
-
-- name: Generate Borg ssh keypair for root
-  ansible.builtin.command: ssh-keygen -t ed25519 -f /root/.ssh/borg_key -N ''
-  args:
-    creates: /root/.ssh/borg_key
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
-
-- name: Fetch Borg public key
-  ansible.builtin.slurp:
-    src: /root/.ssh/borg_key.pub
-  register: borg_pubkey_raw
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
-
-- name: Set Borg pubkey string
-  ansible.builtin.set_fact:
-    borg_pubkey: "{{ borg_pubkey_raw.content | b64decode }}"
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
-
-- name: Ensure /root/.ssh exists
-  ansible.builtin.file:
-    path: /root/.ssh
-    state: directory
-    mode: '0700'
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
-
-- name: Authorize peer Borg key on backup
-  ansible.builtin.authorized_key:
-    user: root
-    key: "{{ hostvars['wso_prod'].borg_pubkey }}"
-    comment: "Borg key"
-  when: inventory_hostname == 'wso_backup'
-
-- name: Authorize peer Borg key on prod
-  ansible.builtin.authorized_key:
-    user: root
-    key: "{{ hostvars['wso_backup'].borg_pubkey }}"
-    comment: "Borg key"
-  when: inventory_hostname == 'wso_prod'
-
-- name: Ensure SSH config exists
-  ansible.builtin.file:
-    path: /root/.ssh/config
-    state: touch
-    mode: '0600'
-    owner: root
-    group: root
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
-
-- name: Add SSH identity config for peer
-  ansible.builtin.blockinfile:
-    path: /root/.ssh/config
-    create: true
-    owner: root
-    group: root
-    mode: '0600'
-    block: |
-      Host wso_backup
-        IdentityFile /root/.ssh/borg_key
-        User root
-        IdentitiesOnly true
-
-      Host wso_prod
-        IdentityFile /root/.ssh/borg_key
-        User root
-        IdentitiesOnly true
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
-
-- name: enable user_allow_other in fuse.conf
-  ansible.builtin.lineinfile:
-    path: /etc/fuse.conf
-    regexp: '^#?user_allow_other'
-    line: 'user_allow_other'
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
-
-# - name: deploy sshfs mount on backup (mounts prod:/ -> /remote)
-#   template:
-#     src: sshfs-automount.service.j2
-#     dest: /etc/systemd/system/remote.mount
-#     mode: '0644'
-#   vars:
-#     remote_host: "{{ hostvars['wso_prod'].host_name }}"
-#     remote_path: "/"
-#     local_path: "/remote"
-#   when: inventory_hostname == 'wso_backup'
-
-# - name: deploy sshfs mount on prod (mounts backup:/backup -> /backup)
-#   template:
-#     src: sshfs-automount.service.j2
-#     dest: /etc/systemd/system/backup.mount
-#     mode: '0644'
-#   vars:
-#     remote_host: "{{ hostvars['wso_backup'].host_name }}"
-#     remote_path: "/backup"
-#     local_path: "/backup"
-#   when: inventory_hostname == 'wso_prod'
-
-# - name: enable and start sshfs mount unit
-#   systemd:
-#     name: "{{ local_path | regex_replace('^/', '') }}.mount"
-#     enabled: true
-#     state: started
-#   when: local_path is defined
+- name: Install Borg-backup
+  ansible.builtin.dnf:
+    name: borgbackup
+    state: present
 
 - name: Copy backup shell script
   ansible.builtin.copy:
     src: backer-upper.sh
     dest: /root/ansible/
     force: true
-  when: inventory_hostname == 'wso_prod'
 
-# TODO: change this on production
+- name: Check if Borg repo is already initialized
+  ansible.builtin.shell: yes | borg info /wsobackup
+  register: borg_repo_check
+  ignore_errors: true
+
+- name: Initialize Borg repo if not present
+  ansible.builtin.command: borg init --encryption=none /wsobackup
+  when: borg_repo_check.rc != 0
+
+- name: Make backup script executable
+  ansible.builtin.shell: chmod +x /root/ansible/backer-upper.sh
+
 - name: Make Borg cronjob log backup
   ansible.builtin.cron:
-     name: Borg log backup
-     disabled: true
+     name: "Borg log backup"
+     disabled: false
      hour: "1"
      minute: "0"
-     job: "/bin/bash -l -c /root/ansible/backer-upper.sh"
-  when: inventory_hostname == 'wso_prod'
+     user: root
+     job: "/bin/bash -l -c /root/ansible/backer-upper.sh >> /var/log/borg-backup.log 2>&1"
 
 
   

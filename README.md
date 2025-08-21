@@ -49,9 +49,13 @@ $ ansible-galaxy collection install community.general
 ```
 This will install the required dependencies. The scripts `setup.ps1` and `setup.sh` do this for you, but only if they successfully installed Ansible for you. If they did not, or you installed Ansible without them, you need to run this manually. 
 
-Be sure that you have enabled password login in your VM's SSH config, and that the root account has a password. Change the Makefile to log in as another user if you'd prefer (they must be able to run `sudo` though). Another thing: make sure that when you cloned the VMs, you changed the MAC address on each one; if you did not, do this now. Also take this moment to quickly determine what the IP address is of each machine (you can find this by running `ip a` and noting down the address, called `inet`, for the interface it uses to connect to the internet, which is likely `enp0s1` if you're in a VM), and edit `inventory/hosts.ini` accordingly. Make sure each machine has the same root password, which can be changed with `passwd root`.
+Be sure that you have enabled password login in your VM's SSH config, and that the root account has an SSH key from your machine; if you have no idea how to do that, [read up on it here](https://www.cyberciti.biz/faq/how-to-set-up-ssh-keys-on-linux-unix/). You can change the Makefile to log in as another user if you'd prefer (they must be able to run `sudo` though). 
 
-You will need a fast internet connection for the Ansible tests to work (the tasks re-install the DNF package cache a few times, which can be slow), so make sure to set up your internet connection accordingly before starting.
+Another thing: make sure that when you cloned the VMs, you changed the MAC address on each one; if you did not, do this now. Also take this moment to quickly determine what the IP address is of each machine (you can find this by running `ip a` and noting down the address, called `inet`, for the interface it uses to connect to the internet, which is likely `enp0s1` if you're in a VM), and edit `inventory/hosts.ini` accordingly. 
+
+Make sure that you can SSH into each machine without requiring a password!
+
+You will need a fast internet connection for Ansible to work (the tasks re-install the DNF package cache a few times, which can be slow), so make sure to set up your internet connection accordingly before starting.
 
 Then, run the command:
 ``` shell
@@ -61,10 +65,16 @@ Alternatively, do:
 ``` shell
 $ make run-dev # get better debugging
 ```
-
-Enter the password you use to login as root for the machines. Then, Ansible will execute all of the tasks as you requested. You can safely re-run this over and over again as you test. Be sure sure that all machines use *the same root password*, otherwise this may not work! You also want root login for SSH, so make sure you have that enabled.
+Then, Ansible will execute all of the tasks as you requested. You can safely re-run this over and over again as you test.
 
 Once Ansible finishes, reboot each machine. You've now got your new machines, set up just like they should be! Make sure to `dnf -y update && dnf -y upgrade` in each to make sure they get the latest packages, as we don't do it for you in case it accidentally breaks something.
+
+## Deploying to Production
+You must be very careful when doing this, but what you're doing is simply swapping out the test VMs for the real ones. Copy your SSH key into each of them, then run:
+```shell
+$ make ping
+```
+This ensures you are correctly connected. Then, run the job. NEVER use a real server to test your Ansible code -- ALWAYS run in a VM first!
 
 ## Known Caveats
 

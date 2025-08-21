@@ -16,8 +16,7 @@
 # Most of this was shamelessly stolen from Borg's documentation.
 # Make sure to read that if you have any questions.
 
-# define variables
-export BORG_REPO=ssh://root@wso-backup:backup/wso
+export BORG_REPO=/wsobackup
 
 # error handling and pretty printing
 info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
@@ -39,7 +38,7 @@ borg create                         \
     --exclude 'var/tmp/*'           \
                                     \
     ::'{hostname}-{now}'            \
-    /etc                            \ #prob don't need, ansible's got it
+    /etc                            \ 
     /home                           \
     /root                           \
     /var
