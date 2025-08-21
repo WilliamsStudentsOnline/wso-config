@@ -1,0 +1,20 @@
+##### WSO-Config WSO 2.0 #####
+# Note that this is only for installing the servers,
+# not for actually configuring them. For that, use a wso-specific task
+
+- name: Install MariaDB client
+  ansible.builtin.dnf:
+    name: mariadb
+    state: present
+
+- name: Install MariaDB server
+  ansible.builtin.dnf:
+    name: mariadb-server
+    state: present
+
+- name: Enable and start MariaDB
+  ansible.builtin.systemd:
+    name: mariadb
+    enabled: true
+    state: started
+    
