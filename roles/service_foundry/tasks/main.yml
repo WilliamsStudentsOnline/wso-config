@@ -1,0 +1,72 @@
+##### WSO-Config WSO 2.0 #####
+
+# this is a shell of a file that doesn't unpack foundry.
+# you will need to get the license key and unpack it yourself, but the rest is simple.
+
+- name: Install Foundry dependencies
+  ansible.builtin.dnf:
+    name: "{{ foundry_packages }}"
+    state: present
+  vars:
+    foundry_packages:
+      - nodejs
+      - nodejs-npm     
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Foundry user for security
+  ansible.builtin.user:
+    name: foundry
+    comment: Foundry Server User
+    uid: 2020  # year Pathfinder 2e released
+    shell: /bin/false
+    home: /opt/foundry
+    create_home: false
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Foundry data directory
+  ansible.builtin.file:
+    path: /wso/foundryvtt
+    state: directory
+    owner: foundry
+  when: inventory_hostname == 'wso_prod'
+
+# remember to set /wso/foundryvtt as the dataPath in the command line args!
+
+# TODO: change this in production
+- name: Deploy Nginx serve
+  ansible.builtin.copy:
+    dest: /etc/nginx/conf.d/foundryvtt.conf
+    force: true
+    content: |
+        server {
+            # Enter your fully qualified domain name or leave blank
+            #server_name             your.hostname.com;
+            # Listen on port 80 without SSL certificates
+            listen                  80;
+            # Sets the Max Upload size to 300 MB
+            client_max_body_size 300M;
+            # Proxy Requests to Foundry VTT
+            location / {
+                     # Set proxy headers
+                     proxy_set_header Host $host;
+                     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                     proxy_set_header X-Forwarded-Proto $scheme;
+
+                     # These are important to support WebSockets
+                     proxy_set_header Upgrade $http_upgrade;
+                     proxy_set_header Connection "Upgrade";
+
+                     # Make sure to set your Foundry VTT port number
+                     proxy_pass http://localhost:30000;
+                   }
+        }            
+  when: inventory_hostname == 'wso_prod'
+
+- name: Copy Foundry systemd service
+  ansible.builtin.copy:
+    src: foundryvtt.service
+    force: true
+    dest: /etc/systemd/system/foundryvtt.service
+  when: inventory_hostname == 'wso_prod'
+
+# we don't start it because you have to have successfully installed it to really bother. do this manually. Ansible shouldn't do this since it's against the terms of EULA to automate installation.
