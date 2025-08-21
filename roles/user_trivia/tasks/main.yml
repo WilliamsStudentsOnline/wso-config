@@ -10,3 +10,4 @@
     generate_ssh_key: true
     ssh_key_type: "ed25519"
     ssh_key_comment: "Ansible-generated Trivia FTP access key on $HOSTNAME"
+  when: inventory_hostname == 'wso_prod'

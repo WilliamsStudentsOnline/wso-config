@@ -18,13 +18,6 @@
     state: enabled
     zone: public
 
-- name: Set default target to DROP
-  ansible.posix.firewalld:
-    state: enabled
-    permanent: true
-    zone: public
-    target: DROP
-
 - name: Allow loopback
   ansible.builtin.command: >
     firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT 0 -i lo -j ACCEPT
@@ -62,6 +55,7 @@
     zone: public
     permanent: true
     state: enabled
+  when: inventory_hostname == 'wso_prod'
 
 - name: Allow Prometheus
   ansible.posix.firewalld:
@@ -132,6 +126,13 @@
     permanent: true
     state: enabled
   when: inventory_hostname == 'wso_prod'
+
+- name: Set default target to DROP
+  ansible.posix.firewalld:
+    state: enabled
+    permanent: true
+    zone: public
+    target: DROP
 
 - name: Reload firewalld
   ansible.builtin.command: firewall-cmd --reload

@@ -4,29 +4,29 @@
   ansible.builtin.get_url:
     url: https://rpm.grafana.com/gpg.key
     dest: /tmp/grafana-gpg.key
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Import Grafana GPG signing key
   ansible.builtin.shell: sudo rpm --import /tmp/grafana-gpg.key
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Copy Grafana repository
   ansible.builtin.copy:
     src: grafana.repo
     force: true
     dest: /etc/yum.repos.d/grafana.repo
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Update DNF cache after adding repo
   ansible.builtin.dnf:
     update_cache: true
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Install Grafana
   ansible.builtin.dnf:
     name: grafana
     state: present
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Copy Grafana service file
   ansible.builtin.copy:
@@ -36,11 +36,11 @@
     group: 'grafana'
     owner: 'grafana'
     dest: /usr/lib/systemd/system/
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Refresh systemd service file cache
   ansible.builtin.shell: systemctl daemon-reload
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Copy Grafana configuration file
   ansible.builtin.copy:
@@ -50,7 +50,7 @@
     group: 'grafana'
     owner: 'grafana'
     dest: /etc/grafana/
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 # TODO: apparently you can do this in Ansible nowadays,
 # so we should stop doing it this old-fashioned way.
@@ -62,22 +62,22 @@
     group: 'grafana'
     owner: 'grafana'
     dest: /var/lib/grafana/
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Unbreak Grafana permissions
   ansible.builtin.shell: chmod -R u+rwX /var/lib/grafana
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Unbreak Grafana SELinux permissions
   ansible.builtin.shell: restorecon -Rv /var/lib/grafana
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Enable and start Grafana
   ansible.builtin.systemd:
     name: grafana
     enabled: true
     state: started
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Deploy Grafana vhost
   ansible.builtin.copy:
@@ -103,12 +103,12 @@
              access_log /var/log/nginx/grafana_access.log;
              error_log /var/log/nginx/grafana_error.log;
          }
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Restart Nginx
   ansible.builtin.systemd:
     name: nginx
     state: restarted
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
     
   

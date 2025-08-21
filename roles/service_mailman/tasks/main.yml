@@ -1,4 +1,8 @@
 ##### WSO-Config WSO 2.0 #####
+# IMPORTANT NOTE:
+# Jenkins uses 8080, so you'll need to edit docker-compose.yml
+# post-clone in order to get this to work without blowing up.
+# we don't set that here because overriding it is annoying and useless.
 
 - name: Add Mailman group
   ansible.builtin.group:
@@ -15,7 +19,6 @@
      shell: /bin/false
      group: mailman
      create_home: false
-     skeleton: "" # never logged into so no need for it
      state: present
   when: inventory_hostname == 'wso_prod'
 
@@ -54,9 +57,10 @@
 
 - name: Git checkout Docker Mailman
   ansible.builtin.git:
-    repo: 'https://github.com/ansible/ansible.git'
+    repo: 'https://github.com/maxking/docker-mailman'
     dest: /opt/mailman/docker-mailman
     update: false
+    version: v0.5.2
   when: inventory_hostname == 'wso_prod'
 
 - name: Fix perms for Docker Mailman
@@ -75,10 +79,10 @@
   ansible.builtin.command: systemctl daemon-reload
   when: inventory_hostname == 'wso_prod'
 
-# - name: Enable and start Mailman service
-#   systemd:
-#     name: mailman
-#     enabled: true
-#     state: started
-#   when: inventory_hostname == 'wso_prod'
+- name: Enable and start Mailman service
+  ansible.builtin.systemd:
+    name: mailman
+    enabled: true
+    state: started
+  when: inventory_hostname == 'wso_prod'
 

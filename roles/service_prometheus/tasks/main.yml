@@ -7,14 +7,14 @@
 - name: Download Prometheus
   ansible.builtin.get_url:
   # TODO: change this on prod to the right arch
-    url: https://github.com/prometheus/prometheus/releases/download/v3.5.0/prometheus-3.5.0.linux-arm64.tar.gz
+    url: https://github.com/prometheus/prometheus/releases/download/v3.5.0/prometheus-3.5.0.linux-amd64.tar.gz
     dest: /tmp/prometheus.tar.gz
   when: inventory_hostname == 'wso_prod'
 
 - name: Download Prometheus Node Exporter
   ansible.builtin.get_url:
   # TODO: change this on prod to the right arch
-    url: https://github.com/prometheus/node_exporter/releases/download/v1.9.1/node_exporter-1.9.1.linux-arm64.tar.gz
+    url: https://github.com/prometheus/node_exporter/releases/download/v1.9.1/node_exporter-1.9.1.linux-amd64.tar.gz
     dest: /tmp/node.tar.gz
 
 - name: Extract Prometheus
@@ -33,7 +33,7 @@
 - name: Move Prometheus binary
   ansible.builtin.copy:
     remote_src: true
-    src: /tmp/prometheus-3.5.0.linux-arm64/prometheus
+    src: /tmp/prometheus-3.5.0.linux-amd64/prometheus
     dest: /usr/local/bin/prometheus
     mode: '0755'
   when: inventory_hostname == 'wso_prod'
@@ -41,7 +41,7 @@
 - name: Move Prometheus Node Exporter binary
   ansible.builtin.copy:
     remote_src: true
-    src: /tmp/node_exporter-1.9.1.linux-arm64/node_exporter
+    src: /tmp/node_exporter-1.9.1.linux-amd64/node_exporter
     dest: /usr/local/bin/node_exporter
     mode: '0755'
 
@@ -50,6 +50,13 @@
     src: prometheus.service
     dest: /usr/lib/systemd/system/prometheus.service
     mode: '0755'
+  when: inventory_hostname == 'wso_prod'
+
+- name: Create Prometheus directories
+  ansible.builtin.file:
+    path: /etc/prometheus
+    state: directory
+    recurse: true
   when: inventory_hostname == 'wso_prod'
 
 - name: Install Prometheus config
@@ -70,6 +77,7 @@
     name: prometheus
     system: true
     shell: /sbin/nologin
+    create_home: false
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Prometheus Node Exporter user
@@ -77,6 +85,7 @@
     name: node_exporter
     system: true
     shell: /sbin/nologin
+    create_home: false
 
 - name: Make Prometheus data directories
   ansible.builtin.file:
@@ -101,7 +110,7 @@
     state: started
   when: inventory_hostname == 'wso_prod'
 
-- name: Enable & start Prometheus
+- name: Enable & start Node Exporter
   ansible.builtin.systemd:
     name: node_exporter
     enabled: true
@@ -132,12 +141,12 @@
              access_log /var/log/nginx/prometheus_access.log;
              error_log /var/log/nginx/prometheus_error.log;
          }
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
 - name: Restart Nginx
   ansible.builtin.systemd:
     name: nginx
     state: restarted
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_backup'
+  when: inventory_hostname == 'wso_prod'
 
-# TODO: configure Prometheus
+# TODO: configure Prometheus for wso-go

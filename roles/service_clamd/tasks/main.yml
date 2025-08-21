@@ -10,11 +10,11 @@
       - clamav-update
       - clamd
 
-- name: Ensure clamd config exists
-  ansible.builtin.copy:
-    src: scan.conf
-    dest: /etc/clamd.d/scan.conf
-    force: false
+# - name: Ensure clamd config exists
+#   ansible.builtin.copy:
+#     src: scan.conf
+#     dest: /etc/clamd.d/scan.conf
+#     force: false
     
 # - name: Ensure freshclam config exists
 #   ansible.builtin.copy:
@@ -23,25 +23,25 @@
 #     remote_src: true
 #     force: no
 
-- name: Create virus database dir
-  ansible.builtin.file:
-    path: /var/lib/clamav
-    state: directory
-    owner: clamupdate
-    group: clamupdate
-    mode: '0755'
+# - name: Create virus database dir
+#   ansible.builtin.file:
+#     path: /var/lib/clamav
+#     state: directory
+#     owner: clamupdate
+#     group: clamupdate
+#     mode: '0755'
 
-- name: Run freshclam manually if no DB exists
-  ansible.builtin.command: freshclam
-  when: not (lookup('ansible.builtin.fileglob', '/var/lib/clamav/*.cvd', errors='ignore'))
-  register: clamav_db_update
-  changed_when: "'Downloading' in clamav_db_update.stdout"
+# - name: Run freshclam manually if no DB exists
+#   ansible.builtin.command: freshclam
+#   when: not (lookup('ansible.builtin.fileglob', '/var/lib/clamav/*.cvd', errors='ignore'))
+#   register: clamav_db_update
+#   changed_when: "'Downloading' in clamav_db_update.stdout"
 
-- name: Enable and start clamd
-  ansible.builtin.systemd:
-    name: clamd@scan
-    enabled: true
-    state: started
+# - name: Enable and start clamd
+#   ansible.builtin.systemd:
+#     name: clamd@scan
+#     enabled: true
+#     state: started
 
 # TODO: we want to make this better
 # https://docs.clamav.net/manual/Usage/Configuration.html
