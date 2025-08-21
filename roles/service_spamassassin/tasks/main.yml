@@ -10,7 +10,7 @@
 #   ansible.builtin.copy:
 #     src: spamassassin-update.service
 #     force: true
-#     dest: /usr/lib/systemd/system/spamassassin-update.service
+#     dest: /etc/systemd/system/spamassassin-update.service
 #     mode: '0644'
 #   when: inventory_hostname == 'wso_prod'
 
@@ -18,7 +18,7 @@
 #   ansible.builtin.copy:
 #     src: spamassassin-update.timer
 #     force: true
-#     dest: /usr/lib/systemd/system/spamassassin-update.timer
+#     dest: /etc/systemd/system/spamassassin-update.timer
 #     mode: '0644'
 #   when: inventory_hostname == 'wso_prod'
 

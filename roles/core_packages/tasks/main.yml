@@ -21,6 +21,7 @@
       - fuse
       - unzip
       - fastfetch
+      - ncdu      
 
 # define these in the host_vars section
 - name: Install machine-specific packages

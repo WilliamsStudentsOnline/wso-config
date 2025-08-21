@@ -71,7 +71,7 @@
   ansible.builtin.copy:
     src: mailman.service
     force: true
-    dest: /usr/lib/systemd/system/mailman.service
+    dest: /etc/systemd/system/mailman.service
     mode: '0644'
   when: inventory_hostname == 'wso_prod'
 

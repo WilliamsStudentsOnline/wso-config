@@ -35,7 +35,7 @@
     mode: '0755'
     group: 'grafana'
     owner: 'grafana'
-    dest: /usr/lib/systemd/system/
+    dest: /etc/systemd/system/
   when: inventory_hostname == 'wso_prod'
 
 - name: Refresh systemd service file cache

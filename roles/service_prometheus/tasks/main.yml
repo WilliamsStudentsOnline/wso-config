@@ -48,7 +48,7 @@
 - name: Install Prometheus service
   ansible.builtin.copy:
     src: prometheus.service
-    dest: /usr/lib/systemd/system/prometheus.service
+    dest: /etc/systemd/system/prometheus.service
     mode: '0755'
   when: inventory_hostname == 'wso_prod'
 
@@ -69,7 +69,7 @@
 - name: Install Prometheus Node Exporter service
   ansible.builtin.copy:
     src: node_exporter.service
-    dest: /usr/lib/systemd/system/node_exporter.service
+    dest: /etc/systemd/system/node_exporter.service
     mode: '0755'
   
 - name: Create Prometheus user

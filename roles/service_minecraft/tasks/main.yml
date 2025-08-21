@@ -279,7 +279,7 @@
   ansible.builtin.copy:
     src: minecraft.service
     force: true
-    dest: /usr/lib/systemd/system/minecraft.service
+    dest: /etc/systemd/system/minecraft.service
   when: inventory_hostname == 'wso_prod'
 
 - name: Chown Minecraft to mc user
