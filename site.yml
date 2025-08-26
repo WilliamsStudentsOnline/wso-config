@@ -1,5 +1,5 @@
 ##### WSO-Config WSO 2.0 #####
-- name: WSO Server Config
+- name: WSO Server Configuration
   hosts: all
   # turn off in production, some errors are natural and fine
   # but it's useful to keep this on for debugging reasons
@@ -13,6 +13,8 @@
     - hardening
     - networking
     - fresh_kernel
+
+    # TODO: add a service for uptime-kuma to replace cachet
 
     # services
     - service_auditd
@@ -34,7 +36,6 @@
     - service_oomd
     - service_jenkins
     - service_mediawiki
-    #- service_cachet
     - service_minecraft
     - service_foundry    
     - service_clamd    
