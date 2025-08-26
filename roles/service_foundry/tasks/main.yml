@@ -32,36 +32,6 @@
 
 # remember to set /wso/foundryvtt as the dataPath in the command line args!
 
-# TODO: change this in production
-- name: Deploy Nginx serve
-  ansible.builtin.copy:
-    dest: /etc/nginx/conf.d/foundryvtt.conf
-    force: true
-    content: |
-        server {
-            # Enter your fully qualified domain name or leave blank
-            #server_name             your.hostname.com;
-            # Listen on port 80 without SSL certificates
-            listen                  80;
-            # Sets the Max Upload size to 300 MB
-            client_max_body_size 300M;
-            # Proxy Requests to Foundry VTT
-            location / {
-                     # Set proxy headers
-                     proxy_set_header Host $host;
-                     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                     proxy_set_header X-Forwarded-Proto $scheme;
-
-                     # These are important to support WebSockets
-                     proxy_set_header Upgrade $http_upgrade;
-                     proxy_set_header Connection "Upgrade";
-
-                     # Make sure to set your Foundry VTT port number
-                     proxy_pass http://localhost:30000;
-                   }
-        }            
-  when: inventory_hostname == 'wso_prod'
-
 - name: Copy Foundry systemd service
   ansible.builtin.copy:
     src: foundryvtt.service

@@ -79,32 +79,6 @@
     state: started
   when: inventory_hostname == 'wso_prod'
 
-- name: Deploy Grafana vhost
-  ansible.builtin.copy:
-    dest: /etc/nginx/conf.d/grafana.conf
-    force: true
-    content: |
-         server {
-             listen 80;
-             server_name grafana.local;
-
-             location = /grafana {
-                      return 302 /grafana/;
-             }
-
-             location /grafana/ {
-                 proxy_pass http://localhost:9091/;
-                 proxy_set_header Host $host;
-                 proxy_set_header X-Real-IP $remote_addr;
-                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                 proxy_set_header X-Forwarded-Proto $scheme;
-             }
-             
-             access_log /var/log/nginx/grafana_access.log;
-             error_log /var/log/nginx/grafana_error.log;
-         }
-  when: inventory_hostname == 'wso_prod'
-
 - name: Restart Nginx
   ansible.builtin.systemd:
     name: nginx

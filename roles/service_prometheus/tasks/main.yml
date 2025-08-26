@@ -116,33 +116,6 @@
     enabled: true
     state: started
 
-- name: Deploy Prometheus vhost
-  ansible.builtin.copy:
-    dest: /etc/nginx/conf.d/prometheus.conf
-    force: true
-    content: |
-         server {
-             listen 80;
-             server_name prometheus.local;
-
-
-             location = /prometheus {
-                      return 302 /prometheus/;
-             }
-
-             location /prometheus/ {
-                 proxy_pass http://localhost:9090/;
-                 proxy_set_header Host $host;
-                 proxy_set_header X-Real-IP $remote_addr;
-                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                 proxy_set_header X-Forwarded-Proto $scheme;
-             }
-             
-             access_log /var/log/nginx/prometheus_access.log;
-             error_log /var/log/nginx/prometheus_error.log;
-         }
-  when: inventory_hostname == 'wso_prod'
-
 - name: Restart Nginx
   ansible.builtin.systemd:
     name: nginx
