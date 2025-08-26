@@ -1,8 +1,6 @@
 ##### WSO-Config WSO 2.0 #####
 # IMPORTANT NOTE:
-# Jenkins uses 8080, so you'll need to edit docker-compose.yml
-# post-clone in order to get this to work without blowing up.
-# we don't set that here because overriding it is annoying and useless.
+# Jenkins uses 8080, so check docker-compose.yml for correct port
 
 - name: Add Mailman group
   ansible.builtin.group:

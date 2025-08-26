@@ -1,5 +1,5 @@
 [Unit]
-Description=Foundry VirturalTableTop
+Description=Foundry Virtural Table Top
 After=network.target nginx.service
 
 [Service]

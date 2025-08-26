@@ -13,3 +13,14 @@
 
 - name: Unbreak nginx SELinux permissions
   ansible.builtin.shell: setsebool -P httpd_can_network_connect 1
+
+- name: Copy nginx master config file
+  ansible.builtin.copy:
+    src: services.conf
+    dest: /etc/nginx/conf.d/services.conf
+    force: false
+
+- name: Restart Nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted

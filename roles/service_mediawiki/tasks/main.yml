@@ -44,15 +44,11 @@
     src: /tmp/mediawiki.tar.gz
     dest: /srv/www/wiki
     remote_src: true
-    creates: /srv/www/wiki/mediawiki-1.41.1
+    creates: /srv/www/wiki/mediawiki
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
-- name: Symlink MediaWiki to a clean path
-  ansible.builtin.file:
-    src: /srv/www/wiki/mediawiki-1.41.1
-    dest: /srv/www/wiki/html
-    state: link
-    force: false
+- name: Fix the extracted MediaWiki
+  ansible.builtin.command: mv /srv/www/wiki/mediawiki/* /srv/www/wiki/
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
   
 - name: Set SELinux context on /srv and subdirs for Nginx
@@ -84,43 +80,7 @@
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Set permissions with shell (recursive chown)
-  ansible.builtin.shell: chown -R nginx:nginx /srv/www/wiki/html
-  when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
-
-# TODO: change this in production
-- name: Deploy Nginx serve
-  ansible.builtin.copy:
-    dest: /etc/nginx/conf.d/wiki.conf
-    force: true
-    content: |
-        server {
-               listen 80;
-               server_name wiki.local;
-
-               root /srv/www/wiki/html;
-               index index.php index.html index.htm;
-
-
-               location = /willipedia {
-                        return 302 /willipedia/;
-               }
-
-               location /willipedia/ {
-                        alias /srv/www/wiki/html/;
-                        index index.php index.html;
-
-                        try_files $uri $uri/ /index.php;
-
-                        location ~ \.php$ {
-                                 include fastcgi_params;
-                                 fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;  # adjust as needed
-                                 fastcgi_param SCRIPT_FILENAME $request_filename;
-                                 fastcgi_param SCRIPT_NAME $fastcgi_script_name;
-                        }
-               }
-               access_log /var/log/nginx/mediawiki_access.log;
-               error_log /var/log/nginx/mediawiki_error.log;
-         }            
+  ansible.builtin.shell: chown -R nginx:nginx /srv/www/wiki/
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Restart Nginx

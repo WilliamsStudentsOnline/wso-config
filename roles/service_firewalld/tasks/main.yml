@@ -87,6 +87,14 @@
     state: enabled
   when: inventory_hostname in ['wso_prod', 'wso_dev']
 
+- name: Allow Minecraft BlueMap
+  ansible.posix.firewalld:
+    port: 8100/tcp
+    zone: public
+    permanent: true
+    state: enabled
+  when: inventory_hostname == 'wso_prod'
+
 - name: Allow Mailman web interface
   ansible.posix.firewalld:
     port: 8000/tcp
