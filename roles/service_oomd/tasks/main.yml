@@ -1,7 +1,4 @@
 ##### WSO-Config WSO 2.0 #####
-# TODO: this seems to fail because of a kernel error.
-# I'm leaving it in, in the event that it's ever fixed,
-# because it's a very useful feature to have.
 
 - name: Install oomd
   ansible.builtin.dnf:
