@@ -7,12 +7,12 @@
   become: true
   roles:
     # essential configuration
-    - branding
-    - ensure_packages
-    - core_packages
-    - hardening
-    - networking
-    - fresh_kernel
+    - special_branding
+    - special_ensure_packages
+    - special_core_packages
+    - special_hardening
+    - special_networking
+    - special_fresh_kernel
 
     # TODO: add a service for uptime-kuma to replace cachet
 
@@ -48,3 +48,5 @@
     - user_wso
     - user_trivia
     - user_oit
+
+    - special_cleanup

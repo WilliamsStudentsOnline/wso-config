@@ -1,0 +1,10 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Cleanup orphaned packages
+  ansible.builtin.dnf:
+     autoremove: true
+
+- name: Upgrade all packages
+  ansible.builtin.dnf:
+     name: "*"
+     state: latest
