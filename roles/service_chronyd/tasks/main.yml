@@ -7,6 +7,6 @@
 
 - name: Enable and start chronyd
   ansible.builtin.systemd:
-    name: chrony
+    name: chronyd
     enabled: true
     state: started

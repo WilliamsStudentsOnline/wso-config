@@ -89,3 +89,5 @@
     state: restarted
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
+# so note to future people: connect, do the install, and then get on with your life
+# automating mariaDB stuff is scary. just follow MediaWiki's setup guide for that

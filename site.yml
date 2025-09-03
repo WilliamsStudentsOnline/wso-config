@@ -1,8 +1,7 @@
 ##### WSO-Config WSO 2.0 #####
 - name: WSO Server Configuration
   hosts: all
-  # turn off in production, some errors are natural and fine
-  # but it's useful to keep this on for debugging reasons
+  # it's useful to keep this on for debugging reasons
   ignore_errors: false
   become: true
   roles:
@@ -50,4 +49,5 @@
     - user_trivia
     - user_oit
 
+    # update the global package set, prune leaves
     - special_cleanup
