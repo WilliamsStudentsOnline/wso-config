@@ -1,0 +1,12 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install chronyd
+  ansible.builtin.dnf:
+    name: chrony
+    state: present
+
+- name: Enable and start chronyd
+  ansible.builtin.systemd:
+    name: chrony
+    enabled: true
+    state: started

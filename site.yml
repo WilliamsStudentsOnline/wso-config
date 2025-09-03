@@ -18,6 +18,7 @@
 
     # services
     - service_auditd
+    - service_chronyd
     - service_tuned
     - service_zram
     - service_firewalld
@@ -35,7 +36,7 @@
     - service_mariadb
     - service_oomd
     - service_jenkins
-    - service_mediawiki
+    #- service_mediawiki
     - service_minecraft
     - service_foundry    
     - service_clamd    
