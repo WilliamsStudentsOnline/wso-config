@@ -48,7 +48,7 @@
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
 
 - name: Fix the extracted MediaWiki
-  ansible.builtin.command: mv /srv/www/wiki/mediawiki/* /srv/www/wiki/
+  ansible.builtin.command: bash -c "mv /srv/www/wiki/mediawiki-*/* /srv/www/wiki/"
   when: inventory_hostname == 'wso_prod' or inventory_hostname == 'wso_dev'
   
 - name: Set SELinux context on /srv and subdirs for Nginx
