@@ -50,6 +50,7 @@
     src: prometheus.service
     dest: /etc/systemd/system/prometheus.service
     mode: '0755'
+    force: true
   when: inventory_hostname == 'wso_prod'
 
 - name: Create Prometheus directories
@@ -64,6 +65,7 @@
     src: prometheus.yml
     dest: /etc/prometheus/prometheus.yml
     mode: '0755'
+    force: true
   when: inventory_hostname == 'wso_prod'
 
 - name: Install Prometheus Node Exporter service
@@ -71,6 +73,7 @@
     src: node_exporter.service
     dest: /etc/systemd/system/node_exporter.service
     mode: '0755'
+    force: true
   
 - name: Create Prometheus user
   ansible.builtin.user:

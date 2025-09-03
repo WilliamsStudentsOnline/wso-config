@@ -18,9 +18,12 @@
   ansible.builtin.copy:
     src: services.conf
     dest: /etc/nginx/conf.d/services.conf
-    force: false
+    force: true
 
 - name: Restart Nginx
   ansible.builtin.systemd:
     name: nginx
     state: restarted
+
+# note that you'll need to move the SSL secrets yourself. too sensitive to store
+# them on GitHub. you'll figure it out.
