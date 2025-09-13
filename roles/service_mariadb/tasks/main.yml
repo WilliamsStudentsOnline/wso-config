@@ -6,15 +6,18 @@
   ansible.builtin.dnf:
     name: mariadb
     state: present
+  when: inventory_hostname in ['wso_prod', 'wso_dev']
 
 - name: Install MariaDB server
   ansible.builtin.dnf:
     name: mariadb-server
     state: present
+  when: inventory_hostname in ['wso_prod', 'wso_dev']
 
 - name: Enable and start MariaDB
   ansible.builtin.systemd:
     name: mariadb
     enabled: true
     state: started
+  when: inventory_hostname in ['wso_prod', 'wso_dev']
     

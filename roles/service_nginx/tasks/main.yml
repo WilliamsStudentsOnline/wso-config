@@ -19,6 +19,7 @@
     src: services.conf
     dest: /etc/nginx/conf.d/services.conf
     force: true
+  when: inventory_hostname == 'wso_prod'
 
 - name: Restart Nginx
   ansible.builtin.systemd:

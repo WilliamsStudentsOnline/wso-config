@@ -7,15 +7,18 @@
     - device-mapper-persistent-data
     - lvm2
     state: present
+  when: inventory_hostname in ['wso_prod', 'wso_dev']
 
 - name: Add Docker repo
   ansible.builtin.get_url:
     url: https://download.docker.com/linux/centos/docker-ce.repo
     dest: /etc/yum.repos.d/docker-ce.repo
+  when: inventory_hostname in ['wso_prod', 'wso_dev']
 
 - name: Update DNF cache after adding repo
   ansible.builtin.dnf:
     update_cache: true
+  when: inventory_hostname in ['wso_prod', 'wso_dev']
 
 - name: Install Docker and Docker Compose plugin
   ansible.builtin.dnf:
@@ -25,9 +28,11 @@
     - containerd.io
     - docker-compose-plugin
     state: present
+  when: inventory_hostname in ['wso_prod', 'wso_dev']
 
 - name: Enable and start Docker
   ansible.builtin.systemd:
     name: docker
     state: started
     enabled: true
+  when: inventory_hostname in ['wso_prod', 'wso_dev']
