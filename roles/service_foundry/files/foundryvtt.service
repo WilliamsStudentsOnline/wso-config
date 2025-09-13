@@ -3,17 +3,10 @@ Description=Foundry Virtural Table Top
 After=network.target nginx.service
 
 [Service]
-WorkingDirectory=/opt/foundry
+WorkingDirectory=/opt/foundryvtt
 User=foundry
 Restart=on-failure
-ExecStart=/opt/foundry/foundryvtt --port=30000 --dataPath=/wso/foundryvtt
-Nice=10
-# TODO: need to change these settings on prod, they're arguably too minimal
-IOSchedulingClass=2
-IOSchedulingPriority=7
-# CPUQuota refers to the percent of a core taken up by a service. so this will consume 1 full core, but the other cores should be fine on the machine
-CPUQuota=100% 
-MemoryMax=4028M
+ExecStart=/usr/bin/node /opt/foundryvtt/resources/app/main.js --dataPath=/wso/foundryvtt --proxy /foundry --port=30000 --dataPath=/wso/foundryvtt
 
 [Install]
 WantedBy=multi-user.target
