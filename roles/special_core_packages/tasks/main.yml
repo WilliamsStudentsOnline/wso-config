@@ -21,9 +21,13 @@
       - fuse
       - unzip
       - netcat
+      - tmux       
       - nmap      
       - fastfetch
-      - ncdu      
+      - ncdu
+      - rsync
+      - certbot
+      - go      
 
 # define these in the host_vars section
 - name: Install machine-specific packages
