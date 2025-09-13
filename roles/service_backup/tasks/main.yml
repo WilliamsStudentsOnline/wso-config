@@ -20,10 +20,8 @@
 
 - name: Initialize Borg repo if not present
   ansible.builtin.command: borg init --encryption=none /wsobackup
-  when:
-  - borg_repo_check.rc != 0
-  - inventory_hostname == 'wso_prod'
-
+  when: borg_repo_check.rc != 0
+  
 - name: Make backup script executable
   ansible.builtin.shell: chmod +x /root/ansible/backer-upper.sh
   when: inventory_hostname == 'wso_prod'
