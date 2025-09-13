@@ -29,15 +29,15 @@
     - service_grafana
     - service_prometheus
     - service_docker
-    - service_mailman
+    #- service_mailman
     - service_spamassassin
     - service_postfix
     - service_mariadb
     - service_oomd
-    - service_jenkins
+    #- service_jenkins
     #- service_mediawiki
-    - service_minecraft
-    - service_foundry    
+    #- service_minecraft
+    #- service_foundry    
     - service_clamd    
 
     # wso software
