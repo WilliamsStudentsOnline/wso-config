@@ -11,9 +11,7 @@
     - special_core_packages
     - special_hardening
     - special_networking
-    - special_fresh_kernel
-
-    # TODO: add a service for uptime-kuma to replace cachet
+    # - special_fresh_kernel # TODO: limit to just prod
 
     # services
     - service_auditd
@@ -25,6 +23,7 @@
     #- service_backup # TODO: figure out why ansible hates this now
     - service_dnfauto
     - service_nginx
+    - service_uptimekuma    
     # - service_webmin # TODO: figure out why ansible hates this now
     - service_grafana
     - service_prometheus
