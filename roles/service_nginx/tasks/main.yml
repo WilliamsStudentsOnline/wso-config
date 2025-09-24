@@ -14,12 +14,19 @@
 - name: Unbreak nginx SELinux permissions
   ansible.builtin.shell: setsebool -P httpd_can_network_connect 1
 
-- name: Copy nginx master config file
+- name: Copy nginx master config file (prod)
   ansible.builtin.copy:
     src: services.conf
     dest: /etc/nginx/conf.d/services.conf
     force: true
   when: inventory_hostname == 'wso_prod'
+
+- name: Copy nginx master config file (status)
+  ansible.builtin.copy:
+    src: status.conf
+    dest: /etc/nginx/conf.d/status.conf
+    force: true
+  when: inventory_hostname == 'wso_status'
 
 - name: Restart Nginx
   ansible.builtin.systemd:
