@@ -1,0 +1,51 @@
+##### WSO-Config WSO 2.0 #####
+
+- name: Install node and npm
+  ansible.builtin.dnf:
+     name: "{{ deps }}"
+     state: present
+  vars:
+     deps:
+       - nodejs
+       - nodejs-npm
+  when: inventory_hostname == 'wso_status'
+
+- name: Create Uptime-kuma user for security
+  ansible.builtin.user:
+    name: uptime
+    comment: Uptime-Kuma Daemon
+    uid: 2029  # no significance behind this numeric choice
+    shell: /bin/false
+    home: /opt/uptime-kuma
+    create_home: false
+  when: inventory_hostname == 'wso_status'
+
+- name: Clone Uptime Kuma
+  ansible.builtin.git:
+     repo: 'https://github.com/louislam/uptime-kuma'
+     dest: /opt/uptime-kuma
+     update: true
+  when: inventory_hostname == 'wso_status'
+
+- name: Install systemd service
+  ansible.builtin.copy:
+     src: uptime-kuma.service
+     force: true
+     dest: /etc/systemd/system/uptime-kuma.service
+  when: inventory_hostname == 'wso_status'
+
+- name: Refresh systemd service file cache
+  ansible.builtin.shell: systemctl daemon-reload
+  when: inventory_hostname == 'wso_status'
+
+- name: Chown uptime-kuma to uptime-kuma
+  ansible.builtin.command: chown -R uptime:uptime /opt/uptime-kuma
+  when: inventory_hostname == 'wso_status'
+
+- name: Restart Nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+  when: inventory_hostname == 'wso_status'
+
+# you'll need to start it yourself, impossible to automate NPM sadly
