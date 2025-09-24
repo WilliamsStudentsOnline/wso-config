@@ -27,6 +27,7 @@
       - ncdu
       - rsync
       - certbot
+      - python3-certbot-nginx
       - go      
 
 # define these in the host_vars section

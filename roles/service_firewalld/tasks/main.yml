@@ -153,9 +153,17 @@
     state: enabled
   when: inventory_hostname == 'wso_prod'
 
-- name: Allow Minecraft
+- name: Allow Minecraft (Java)
   ansible.posix.firewalld:
     port: 25565/tcp
+    zone: public
+    permanent: true
+    state: enabled
+  when: inventory_hostname == 'wso_prod'
+
+- name: Allow Minecraft (Bedrock)
+  ansible.posix.firewalld:
+    port: 19132/udp
     zone: public
     permanent: true
     state: enabled
