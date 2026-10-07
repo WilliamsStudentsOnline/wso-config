@@ -1,0 +1,20 @@
+# Baseline for the existing tree so CI can run. Tighten over time; do not treat
+# skips as forever.
+exclude_paths:
+  - roles/service_minecraft/files/
+  - roles/service_mailman/files/
+skip_list:
+  - yaml[trailing-spaces]
+  - yaml[indentation]
+  - yaml[octal-values]
+  - yaml[line-length]
+  - yaml[comments]
+  - yaml[empty-lines]
+  - no-changed-when
+  - risky-file-permissions
+  - command-instead-of-shell
+  - command-instead-of-module
+  - var-naming[no-role-prefix]
+  - ignore-errors
+  - latest
+  - package-latest
