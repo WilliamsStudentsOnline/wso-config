@@ -8,7 +8,7 @@
 
 # too many of these. go check the values in ../../vars/main.yml
 - name: Harden sysctl
-  ansible.builtin.sysctl:
+  ansible.posix.sysctl:
     name: "{{ item.key }}"
     value: "{{ item.value }}"
     state: present
